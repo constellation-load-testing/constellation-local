@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Template, Match } from 'aws-cdk-lib/assertions';
-import * as ConstellationLocal from '../lib/constellation-local-stack';
+import * as ConstellationLocal from '../lib/constellation-home-stack';
 
 test('SQS Queue and SNS Topic Created', () => {
   const app = new cdk.App();
