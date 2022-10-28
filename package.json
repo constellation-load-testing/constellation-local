@@ -8,20 +8,33 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy:home:awsonly": "cd ./src/aws && cdk deploy \"*Home*\"",
+    "destroy:home:awsonly": "cd ./src/aws && cdk destroy \"*Home*\"",
+    "populateS3": "node ./src/scripts/uploadScriptToS3.js",
+    "depopulateS3": "node ./src/scripts/clearS3.js",
+    "depopulateTimestream": "node ./src/scripts/clearTimestream.js",
+    "deploy:home": "npm run deploy:home:awsonly && npm run populateS3",
+    "destroy:home": "npm run depopulateTimestream && npm run depopulateS3 && npm run destroy:home:awsonly"
   },
   "devDependencies": {
-    "aws-cdk": "2.46.0",
     "@types/jest": "^27.5.2",
     "@types/node": "10.17.27",
     "@types/prettier": "2.6.0",
+    "aws-cdk": "2.46.0",
     "jest": "^27.5.1",
     "ts-jest": "^27.1.4",
     "ts-node": "^10.9.1",
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.198.0",
+    "@aws-sdk/client-timestream-query": "^3.198.0",
+    "@aws-sdk/client-timestream-write": "^3.198.0",
     "aws-cdk-lib": "2.46.0",
-    "constructs": "^10.0.0"
+    "aws-sdk": "^2.1242.0",
+    "constructs": "^10.0.0",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
   }
 }
