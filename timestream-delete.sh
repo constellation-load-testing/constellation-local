@@ -1,0 +1,1 @@
+aws --region us-west-2 timestream-write delete-table --database-name sample-database --table-name data_received
