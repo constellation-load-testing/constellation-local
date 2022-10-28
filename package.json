@@ -8,7 +8,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy:home": "cd ./src/aws && cdk deploy \"*Home*\""
   },
   "devDependencies": {
     "aws-cdk": "2.46.0",

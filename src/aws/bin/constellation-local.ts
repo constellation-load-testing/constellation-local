@@ -8,5 +8,11 @@ const REMOTE_REGION = { region: "us-east-1" }
 
 const app = new cdk.App();
 new ConstellationHomeStack(app, 'ConstellationHomeStack', {env: HOME_REGION});
+
+
 new ConstellationRemoteStack(app, 'ConstellationRemoteStack', {env: REMOTE_REGION})
 
+// const array = ['hello', 'world']
+// array.forEach((item) => {
+//   new ConstellationRemoteStack(app, item)
+// }) // this works
