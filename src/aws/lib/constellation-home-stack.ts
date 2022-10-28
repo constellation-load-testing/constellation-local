@@ -8,11 +8,11 @@ export class ConstellationHomeStack extends Stack {
     super(scope, id, props);
     // create a timestream database
     const constellationTimestreamDB = new timestream.CfnDatabase(this, "constellation-timestream-db", {
-      databaseName: "sample-database",
+      databaseName: "constellation-timestream-db",
       tags: [
         {
           key: "Name",
-          value: "sample-database",
+          value: "constellation-timestream-db",
         },
       ],
     });
