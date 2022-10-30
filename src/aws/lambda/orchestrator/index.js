@@ -5,10 +5,8 @@
  * - Determines if and when tests can start executing
  */
 
-exports.handler = async (event) => {
-  console.log(event);
-
-  // is true 10% of the time
+const testConfirmation = () => {
+  // is true 20% of the time
   const isTrue = Math.random() < 0.2;
 
   const response = {
@@ -17,4 +15,16 @@ exports.handler = async (event) => {
   };
 
   return response;
+};
+
+exports.handler = async (event) => {
+  console.log(event);
+
+  const { type } = event;
+
+  if (type === "test-init") {
+    return testConfirmation();
+  } else {
+    return { statusCode: 400, body: "Bad request" };
+  }
 };
