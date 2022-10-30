@@ -16,11 +16,19 @@ export class ConstellationRemoteStack extends Stack {
       roleName: "tester-remote-role"
     })
 
+    // add s3 full access to testerRemoteRole - to review
+    testerRemoteRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonS3FullAccess"))
+
+    // add lambda full access to testerRemoteRole - to review
+    testerRemoteRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambda_FullAccess"))
+        
+
     const timestreamDBRole = new iam.Role(this, 'ecsTaskExecutionRole', {
       assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
       roleName: "timestream-db-role"
     })
 
+    // add timestream full access to timestreamDBRole - to review
     timestreamDBRole.addManagedPolicy(
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonTimestreamFullAccess')
     )
