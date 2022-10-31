@@ -13,11 +13,10 @@
     "destroy:home:awsonly": "cd ./src/aws && cdk destroy \"*Home*\" && cd ../..",
     "deploy:remote:awsonly": "cd ./src/aws && cdk deploy \"*Remote*\" && cd ../..",
     "destroy:remote:awsonly": "cd ./src/aws && cdk destroy \"*Remote*\" && cd ../..",
-    "populateS3": "node ./src/scripts/uploadScriptToS3.js",
-    "depopulateS3": "node ./src/scripts/clearS3.js",
-    "depopulateTimestream": "node ./src/scripts/clearTimestream.js",
-    "deploy:home": "npm run deploy:home:awsonly && npm run populateS3",
-    "destroy:home": "npm run depopulateTimestream && npm run depopulateS3 && npm run destroy:home:awsonly",
+    "deploy:scripts": "node ./src/scripts/deployScripts.js",
+    "destroy:scripts": "node ./src/scripts/destroyScripts.js",
+    "deploy:home": "npm run deploy:home:awsonly && npm run deploy:scripts",
+    "destroy:home": "npm run destroy:scripts && npm run destroy:home:awsonly",
     "deploy:all": "npm run deploy:home && npm run deploy:remote:awsonly",
     "destroy:all": "npm run destroy:remote:awsonly && npm run destroy:home"
   },
@@ -32,6 +31,7 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.199.0",
     "@aws-sdk/client-s3": "^3.198.0",
     "@aws-sdk/client-timestream-query": "^3.198.0",
     "@aws-sdk/client-timestream-write": "^3.198.0",
