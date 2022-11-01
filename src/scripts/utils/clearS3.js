@@ -29,6 +29,11 @@ const getBucket = async (keyword) => {
 // clear s3 bucket
 const clearBucket = async (bucket) => {
   try {
+    if (!bucket) {
+      console.log("No S3 bucket found");
+      return;
+    }
+
     const bucketParams = { Bucket: bucket.Name };
     const data = await s3Client.send(new ListObjectsCommand(bucketParams));
     let noOfObjects = data.Contents;
