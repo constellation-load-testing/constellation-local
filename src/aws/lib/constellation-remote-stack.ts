@@ -23,15 +23,18 @@ export class ConstellationRemoteStack extends Stack {
     testerRemoteRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambda_FullAccess"))
         
 
-    const timestreamDBRole = new iam.Role(this, 'ecsTaskExecutionRole', {
+    const aggRemoteRole = new iam.Role(this, 'ecsTaskExecutionRole', {
       assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
       roleName: "timestream-db-role"
     })
 
-    // add timestream full access to timestreamDBRole - to review
-    timestreamDBRole.addManagedPolicy(
+    // add timestream full access to aggRemoteRole - to review
+    aggRemoteRole.addManagedPolicy(
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonTimestreamFullAccess')
     )
+
+    // aggRemoteRole also needs lambda access
+    aggRemoteRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambda_FullAccess"))
 
     // CONSTRUCTS
     // VPC
@@ -53,7 +56,7 @@ export class ConstellationRemoteStack extends Stack {
         image: ecs.ContainerImage.fromRegistry("jaricheta/generic-agg-placeholder"),
         containerPort: 3000,
         containerName: 'aggregator-container',
-        taskRole: timestreamDBRole,
+        taskRole: aggRemoteRole,
         environment: {
           REGION: this.region,
         }
