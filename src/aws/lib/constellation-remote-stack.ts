@@ -45,14 +45,14 @@ export class ConstellationRemoteStack extends Stack {
     // TASK DEFINITIONS & SERVICES
     // - Data aggregator
     // L3 construct for aggregator due to DNS exposure
-    const telegrafALBService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'constellation-telegraf', {
+    const aggregatorALBService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'constellation-aggregator', {
       cluster: cluster,
       cpu: 512,
       desiredCount: 1,   
       taskImageOptions: {
-        image: ecs.ContainerImage.fromRegistry("athresher/teleproto"),
-        containerPort: 8186,
-        containerName: 'telegraf-container',
+        image: ecs.ContainerImage.fromRegistry("jaricheta/generic-agg-placeholder"),
+        containerPort: 3000,
+        containerName: 'aggregator-container',
         taskRole: timestreamDBRole,
       },
       memoryLimitMiB: 1024,
@@ -71,7 +71,7 @@ export class ConstellationRemoteStack extends Stack {
     // this.account
 
     testerTaskDef.addContainer('constellation-tester-container', {
-      image: ecs.ContainerImage.fromRegistry("jaricheta/k6-placeholder"),
+      image: ecs.ContainerImage.fromRegistry("jaricheta/generic-test-placeholder"),
       memoryLimitMiB: 1024,
       containerName: 'constellation-tester-container',
       essential: true, // default for single container taskdefs
