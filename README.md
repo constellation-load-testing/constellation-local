@@ -162,3 +162,10 @@ const resetTestState = async ({ regions }) => {
   }
 };
 ```
+
+# Testing orchestration
+
+> Test on one location
+
+- Home: `"us-west-2"`
+- Region: `"us-east-1"`

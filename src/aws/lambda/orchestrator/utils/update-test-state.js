@@ -21,7 +21,7 @@ const updateTestState = async () => {
     if (isValid) {
       await putItem("test-start-state", {
         state: true,
-        timestamp: Date.now() + 100 * 1000, // add 100s buffer
+        timestamp: Date.now() + 50 * 1000, // add 50s buffer
       });
     } else {
       return; // the "test-start-state" is left at initial state of: {state: false, timestamp: ""}

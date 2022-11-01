@@ -22,8 +22,11 @@ const readItem = async (id) => {
     };
 
     const command = new GetItemCommand(params);
-    const data = await client.send(command);
-    return data.Item;
+    const { Item } = await client.send(command);
+    /* note: shape
+    { Item: { id: { S: 'aggregator-ready-regions' }, data: { S: '...' } } } 
+    */
+    return Item.data.S;
   } catch (e) {
     console.log(e);
   }

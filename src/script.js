@@ -4,15 +4,15 @@
  * */
 
 const axios = require("axios");
-const DNS = process.env.DNS;
+const DNS = process.env.DNS || "localhost:3000";
 
 const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 const run = async () => {
-  console.log("Intial sleep for 5 seconds to wait for the server to start");
-  await sleep(5000);
+  // this serves no purpose but just to delay axios.get for some reason
+  await sleep(2000);
   console.log({
     message: "Starting test-sleep, making DNS /fromscript request to",
     DNS,
@@ -23,4 +23,4 @@ const run = async () => {
   return { statusCode: 200, body: "Done" };
 };
 
-run();
+module.exports = { script: run };
