@@ -28,7 +28,7 @@ When an aggregator spins up in a region, it invokes the `orchestrator` lambda wi
 > Records the aggregator region
 
 ```js
-const recordAggRegion = async (newAggRegion) => {
+const recordAggRegion = async ({ region: newAggRegion }) => {
   try {
     // fetches the current regions
     const aggRegions = JSON.parse(await readItem("aggregator-ready-regions"));
@@ -133,4 +133,32 @@ const recordTestCompletedRegions = async ({ region }) => {
 // - https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ecs/classes/updateservicecommand.html
 // - https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ecs/interfaces/updateservicecommandinput.html
 // - https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ecs/interfaces/updateservicecommandinput.html#service
+```
+
+### test-reset action type
+
+`test-reset`: has one job. To reset the dynamodb state to initial state. Will be expecting the remote regions as input. It is of type (`test-reset`). At the moment, this is for debugging purposes so we can:
+
+- manually set remote regions for testing
+- while resetting "state"
+
+```js
+// resets state stored in database, very similar to init script of dynamodb
+const resetTestState = async ({ regions }) => {
+  try {
+    // reset agg regions
+    await putItem("aggregator-ready-regions", []);
+    // reset completed regions
+    await putItem("test-completed-regions", []);
+    // reset regions to new regions
+    await putItem("required-remote-regions", remoteRegions);
+    // reset test start state
+    await putItem("test-start-state", {
+      state: false,
+      timestamp: "",
+    });
+  } catch (e) {
+    console.log(e);
+  }
+};
 ```
