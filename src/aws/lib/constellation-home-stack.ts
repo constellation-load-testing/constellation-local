@@ -47,11 +47,7 @@ export class ConstellationHomeStack extends Stack {
         name: "id",
         type: dynamodb.AttributeType.STRING,
       },
-      // add a sort key
-      sortKey: {
-        name: "data",
-        type: dynamodb.AttributeType.STRING,
-      },
+
       // add other properties
       removalPolicy: RemovalPolicy.DESTROY,
     });
@@ -71,6 +67,8 @@ export class ConstellationHomeStack extends Stack {
       environment: {
         CONSTELLATION_DYNAMODB_TABLE: constellationDynamoDBTable.tableName,
       },
+      // assign role
+      role: lambdaRole,
     });
   }
 }

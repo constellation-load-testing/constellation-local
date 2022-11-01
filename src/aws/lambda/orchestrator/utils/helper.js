@@ -1,4 +1,8 @@
-const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
+const {
+  DynamoDBClient,
+  PutItemCommand,
+  GetItemCommand,
+} = require("@aws-sdk/client-dynamodb");
 
 const HOME_REGION = "us-west-2";
 const DYNAMODB_TABLE_NAME = "constellation-dynamodb-table";
