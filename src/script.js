@@ -1,6 +1,6 @@
 /**
  * This will be run in a node.js environment
- * - This just run a sleep function for 5 seconds
+ * - This just run a sleep function for 5 seconds and send a single request to placeholer aggregator
  * */
 
 const axios = require("axios");
@@ -24,13 +24,3 @@ const run = async () => {
 };
 
 run();
-
-// import http from "k6/http";
-// import { sleep } from "k6";
-
-// export default function () {
-//   http.get("https://test.k6.io");
-//   sleep(1);
-// }
-
-// // NOTE: from deployment
