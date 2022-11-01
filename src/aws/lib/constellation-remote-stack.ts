@@ -54,6 +54,9 @@ export class ConstellationRemoteStack extends Stack {
         containerPort: 3000,
         containerName: 'aggregator-container',
         taskRole: timestreamDBRole,
+        environment: {
+          REGION: this.region,
+        }
       },
       memoryLimitMiB: 1024,
       publicLoadBalancer: true      
@@ -80,14 +83,15 @@ export class ConstellationRemoteStack extends Stack {
         logRetention: 7 // logs expire after 7 days
       }),
       environment: {
-        DNS: telegrafALBService.loadBalancer.loadBalancerDnsName,
+        DNS: aggregatorALBService.loadBalancer.loadBalancerDnsName,
+        REGION: this.region,
       }
     })
 
     const testerService = new ecs.FargateService(this, 'constellation-tester-service', {
       cluster: cluster,
       taskDefinition: testerTaskDef,
-      desiredCount: 1, // change to non-1 after pause mode implemented
+      desiredCount: 1, // change to >1 when ready
     })
   }
 }
