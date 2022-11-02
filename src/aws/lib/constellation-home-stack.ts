@@ -1,11 +1,25 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { Stack, StackProps, Duration } from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as iam from "aws-cdk-lib/aws-iam";
 import { aws_timestream as timestream, RemovalPolicy } from "aws-cdk-lib";
 import { Construct } from 'constructs';
+import * as path from "path"
+import * as config from '../../config.json';
 
 export class ConstellationHomeStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
+    // ROLES
+    // lambda role
+    const lambdaRole = new iam.Role(this, "lambda-role", {
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+      roleName: "lambda-role"
+    })
+    // add dynamodb full access to lambdaRole - to review
+    lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonDynamoDBFullAccess"))
+
     // create a timestream database
     const constellationTimestreamDB = new timestream.CfnDatabase(this, "constellation-timestream-db", {
       databaseName: "constellation-timestream-db",
@@ -26,5 +40,35 @@ export class ConstellationHomeStack extends Stack {
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
+    // create a dynamodb table
+    const constellationDynamoDBTable = new dynamodb.Table(this, "constellation-dynamodb-table", {
+      tableName: "constellation-dynamodb-table",
+      partitionKey: {
+        name: "id",
+        type: dynamodb.AttributeType.STRING,
+      },
+
+      // add other properties
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
+    // resource policy for the table - removal upon cdk destroy
+    constellationDynamoDBTable.applyRemovalPolicy(RemovalPolicy.DESTROY);
+
+    // create orchestrator lambda function
+    const constellationOrchestratorLambda = new lambda.Function(this, "constellation-orchestrator-lambda", {
+      functionName: "constellation-orchestrator-lambda",
+      code: lambda.Code.fromAsset(
+        path.join(__dirname, "../lambda/orchestrator")
+        ),
+      handler: "index.handler",
+      runtime: lambda.Runtime.NODEJS_14_X,
+      timeout: Duration.seconds(30),
+      environment: {
+        CONSTELLATION_DYNAMODB_TABLE: constellationDynamoDBTable.tableName,
+      },
+      // assign role
+      role: lambdaRole,
+    });
   }
 }

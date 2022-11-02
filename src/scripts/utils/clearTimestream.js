@@ -59,10 +59,14 @@ const clearDatabase = async (DatabaseName) => {
 const run = async () => {
   try {
     const database = await getDatabase("constellation");
+    if (!database) {
+      console.log("No timestream database found");
+      return;
+    }
     await clearDatabase(database.DatabaseName);
   } catch (e) {
     console.log(e);
   }
 };
 
-run();
+module.exports = run;

@@ -9,13 +9,18 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "deploy:home:awsonly": "cd ./src/aws && cdk deploy \"*Home*\"",
-    "destroy:home:awsonly": "cd ./src/aws && cdk destroy \"*Home*\"",
-    "populateS3": "node ./src/scripts/uploadScriptToS3.js",
-    "depopulateS3": "node ./src/scripts/clearS3.js",
-    "depopulateTimestream": "node ./src/scripts/clearTimestream.js",
-    "deploy:home": "npm run deploy:home:awsonly && npm run populateS3",
-    "destroy:home": "npm run depopulateTimestream && npm run depopulateS3 && npm run destroy:home:awsonly"
+    "bootstrap": "cd ./src/aws && cdk bootstrap && cd ../..",
+    "install:orchestrator": "cd ./src/aws/lambda/orchestrator && npm install && cd ../../../..",
+    "deploy:home:awsonly": "npm run bootstrap && npm run install:orchestrator && cd ./src/aws && cdk deploy \"*Home*\" && cd ../..",
+    "destroy:home:awsonly": "cd ./src/aws && cdk destroy -f \"*Home*\" && cd ../..",
+    "deploy:remote:awsonly": "cd ./src/aws && cdk deploy \"*Remote*\" && cd ../..",
+    "destroy:remote:awsonly": "cd ./src/aws && cdk destroy -f \"*Remote*\" && cd ../..",
+    "deploy:scripts": "node ./src/scripts/deployScripts.js",
+    "destroy:scripts": "node ./src/scripts/destroyScripts.js",
+    "deploy:home": "npm run deploy:home:awsonly && npm run deploy:scripts",
+    "destroy:home": "npm run destroy:scripts && npm run destroy:home:awsonly",
+    "deploy:all": "npm run deploy:home && npm run deploy:remote:awsonly",
+    "destroy:all": "npm run destroy:remote:awsonly && npm run destroy:home"
   },
   "devDependencies": {
     "@types/jest": "^27.5.2",
@@ -28,6 +33,7 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.199.0",
     "@aws-sdk/client-s3": "^3.198.0",
     "@aws-sdk/client-timestream-query": "^3.198.0",
     "@aws-sdk/client-timestream-write": "^3.198.0",

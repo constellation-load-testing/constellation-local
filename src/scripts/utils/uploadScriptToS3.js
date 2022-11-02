@@ -59,7 +59,7 @@ const run = async () => {
 
     // consider adding a fs here
     const file = await fs.readFile(
-      path.join(__dirname, "..", "script.js"),
+      path.join(__dirname, "..", "..", "script.js"),
       "utf8"
     ); // <-- hard coded location
     bucketParams.Body = file;
@@ -72,4 +72,4 @@ const run = async () => {
   }
 };
 
-run();
+module.exports = run;
