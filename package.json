@@ -10,6 +10,7 @@
     "test": "jest",
     "cdk": "cdk",
     "bootstrap": "cd ./src/aws && cdk bootstrap && cd ../..",
+		"visualize": "node frontend/server.js",
     "install:orchestrator": "cd ./src/aws/lambda/orchestrator && npm install && cd ../../../..",
     "deploy:home:awsonly": "npm run bootstrap && npm run install:orchestrator && cd ./src/aws && cdk deploy \"*Home*\" && cd ../..",
     "destroy:home:awsonly": "cd ./src/aws && cdk destroy -f \"*Home*\" && cd ../..",
@@ -39,9 +40,13 @@
     "@aws-sdk/client-timestream-write": "^3.201.0",
     "aws-cdk-lib": "2.46.0",
     "aws-sdk": "^2.1242.0",
+    "axios": "^1.1.3",
     "chalk": "^5.1.2",
     "commander": "^9.4.1",
     "constructs": "^10.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "path": "^0.12.7"
   }
