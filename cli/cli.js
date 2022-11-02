@@ -6,7 +6,7 @@ const {exec} = require('node:child_process');
 program
 	.command('deploy')
 	.description('Deploy the home region with timestream DB')
-	.action(exec('npm run deploy:home'));
+	.action(() => { exec('npm run deploy:home --')} );
 
 program
 	.command('run <script.js>')
