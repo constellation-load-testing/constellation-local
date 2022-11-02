@@ -13,7 +13,7 @@ export class ConstellationRemoteStack extends Stack {
     // ROLES
     const testerRemoteRole = new iam.Role(this, "constellation-remote-role", {
       assumedBy: new iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
-      roleName: "tester-remote-role"
+      roleName: `tester-remote-role-${this.region}` // multi region deployment, otherwise errored for same name
     })
 
     // add s3 full access to testerRemoteRole - to review
@@ -25,7 +25,7 @@ export class ConstellationRemoteStack extends Stack {
 
     const aggRemoteRole = new iam.Role(this, 'ecsTaskExecutionRole', {
       assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
-      roleName: "timestream-db-role"
+      roleName: `timestream-db-role-${this.region}` // multi region deployment, otherwise errored for same name
     })
 
     // add timestream full access to aggRemoteRole - to review
