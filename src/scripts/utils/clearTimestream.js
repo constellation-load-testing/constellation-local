@@ -3,33 +3,21 @@ const {
   TimestreamWriteClient,
   ListTablesCommand,
   DeleteTableCommand,
+	DeleteDatabaseCommand
 } = require("@aws-sdk/client-timestream-write");
 
 const timestreamWrite = new AWS.TimestreamWrite({
-  region: "us-west-2",
+  region: "us-east-1",
 });
 
 const timestreamWriteClient = new TimestreamWriteClient({
-  region: "us-west-2",
+  region: "us-east-1",
 });
 
-// get timestream database
-const getDatabase = async (keyword) => {
-  try {
-    const databases = await timestreamWrite.listDatabases().promise();
-    const database = databases.Databases.find((database) => {
-      return database.DatabaseName.includes(keyword);
-    });
-    return database;
-  } catch (e) {
-    console.log(e);
-  }
-};
-
 // clear timestream database
-const clearDatabase = async (DatabaseName) => {
+const clearDatabase = async () => {
   try {
-    const databaseParams = { DatabaseName };
+		const databaseParams = { DatabaseName: "constellation-timestream-db" };
     const data = await timestreamWriteClient.send(
       new ListTablesCommand(databaseParams)
     );
@@ -58,12 +46,8 @@ const clearDatabase = async (DatabaseName) => {
 
 const run = async () => {
   try {
-    const database = await getDatabase("constellation");
-    if (!database) {
-      console.log("No timestream database found");
-      return;
-    }
-    await clearDatabase(database.DatabaseName);
+    await clearDatabase();
+		await timestreamWriteClient.send(new DeleteDatabaseCommand({ DatabaseName: "constellation-timestream-db" }))
   } catch (e) {
     console.log(e);
   }
