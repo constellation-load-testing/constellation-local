@@ -1,11 +1,12 @@
 const uploadScriptToS3 = require("./utils/uploadScriptToS3.js");
 const initializeDynamoDB = require("./utils/initializeDynamoDB.js");
+const initializeTimestreamDB = require("./utils/initializeTimestreamDB.js");
 
 const run = async () => {
   try {
     await uploadScriptToS3();
     await initializeDynamoDB();
-    // await initializeTimestreamDB();
+    await initializeTimestreamDB();
   } catch (e) {
     console.log(e);
   }

@@ -36,9 +36,11 @@
     "@aws-sdk/client-dynamodb": "^3.199.0",
     "@aws-sdk/client-s3": "^3.198.0",
     "@aws-sdk/client-timestream-query": "^3.198.0",
-    "@aws-sdk/client-timestream-write": "^3.198.0",
+    "@aws-sdk/client-timestream-write": "^3.201.0",
     "aws-cdk-lib": "2.46.0",
     "aws-sdk": "^2.1242.0",
+    "chalk": "^5.1.2",
+    "commander": "^9.4.1",
     "constructs": "^10.0.0",
     "fs": "^0.0.1-security",
     "path": "^0.12.7"
