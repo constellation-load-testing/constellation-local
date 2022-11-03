@@ -1,4 +1,6 @@
 const AWS = require("aws-sdk");
+const configParser = require("./configParser.js");
+
 const {
   TimestreamWriteClient,
   ListTablesCommand,
@@ -7,11 +9,11 @@ const {
 } = require("@aws-sdk/client-timestream-write");
 
 const timestreamWrite = new AWS.TimestreamWrite({
-  region: "us-west-2",
+  region: configParser.HOME_REGION,
 });
 
 const timestreamWriteClient = new TimestreamWriteClient({
-  region: "us-west-2",
+  region: configParser.HOME_REGION,
 });
 
 const getDatabase = async (keyword) => {

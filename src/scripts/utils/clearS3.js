@@ -1,3 +1,5 @@
+const configParser = require("./configParser.js");
+const HOME_REGION = configParser.HOME_REGION;
 const AWS = require("aws-sdk");
 const {
   S3Client,
@@ -6,11 +8,11 @@ const {
 } = require("@aws-sdk/client-s3");
 
 const s3 = new AWS.S3({
-  region: "us-west-2",
+  region: HOME_REGION,
 });
 
 const s3Client = new S3Client({
-  region: "us-west-2",
+  region: HOME_REGION,
 });
 
 const getBucket = async (keyword) => {

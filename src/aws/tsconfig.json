@@ -23,6 +23,7 @@
     "inlineSources": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
+    "allowJs": true,
     "typeRoots": [
       "./node_modules/@types"
     ]

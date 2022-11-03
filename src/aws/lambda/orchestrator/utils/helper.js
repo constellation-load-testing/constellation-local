@@ -4,7 +4,7 @@ const {
   GetItemCommand,
 } = require("@aws-sdk/client-dynamodb");
 
-const HOME_REGION = "us-west-2";
+const HOME_REGION = process.env.HOME_REGION;
 const DYNAMODB_TABLE_NAME = "constellation-dynamodb-table";
 
 const client = new DynamoDBClient({
