@@ -17,8 +17,12 @@ export class ConstellationHomeStack extends Stack {
       assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
       roleName: "lambda-role"
     })
+
     // add dynamodb full access to lambdaRole - to review
     lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonDynamoDBFullAccess"))
+
+    // add ECS full access to lambdaRole - to review
+    lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("AmazonECS_FullAccess"))
 
     // create a timestream database
     const constellationTimestreamDB = new timestream.CfnDatabase(this, "constellation-timestream-db", {
