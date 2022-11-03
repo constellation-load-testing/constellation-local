@@ -4,7 +4,7 @@ console.log(regions);
 const { TimestreamWrite } = require("@aws-sdk/client-timestream-write");
 const { CreateTableCommand } = require("@aws-sdk/client-timestream-write");
 
-const initializeTimestreamDB = async () => {
+const createTimestreamDB = async () => {
   const timestreamWrite = new TimestreamWrite({ region: "us-west-2" });
   const params = {
     DatabaseName: "constellation-timestream-db",
@@ -21,8 +21,7 @@ const initializeTimestreamDB = async () => {
       };
       try {
         const data = await timestreamWrite.send(new CreateTableCommand(params));
-        // console.log(data);
-        console.log("Success. TimestreamDB schema created");
+        console.log(data);
       } catch (err) {
         console.log("Error", err);
       }
@@ -32,4 +31,4 @@ const initializeTimestreamDB = async () => {
   }
 };
 
-module.exports = initializeTimestreamDB;
+module.exports = createTimestreamDB;
