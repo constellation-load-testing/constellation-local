@@ -48,21 +48,35 @@ export class ConstellationRemoteStack extends Stack {
     // TASK DEFINITIONS & SERVICES
     // - Data aggregator
     // L3 construct for aggregator due to DNS exposure
+    // create a security group for the aggregator
+    const aggregatorSecurityGroup = new ec2.SecurityGroup(this, 'aggregator-security-group', {
+      vpc: vpc,
+      allowAllOutbound: true,
+      securityGroupName: `aggregator-security-group-${this.region}`
+    })
+
+    // allow all traffic from anywhere to the aggregator - to review
+    aggregatorSecurityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(), 
+      ec2.Port.allTraffic()
+    )
+
     const aggregatorALBService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'constellation-aggregator', {
       cluster: cluster,
-      cpu: 512,
+      cpu: 4096,
       desiredCount: 1,   
       taskImageOptions: {
-        image: ecs.ContainerImage.fromRegistry("jaricheta/generic-agg-placeholder"),
-        containerPort: 3000,
+        image: ecs.ContainerImage.fromRegistry("jaricheta/constellation-data-aggregator"),
+        containerPort: 3003,
         containerName: 'aggregator-container',
         taskRole: aggRemoteRole,
         environment: {
           REGION: this.region,
         }
       },
-      memoryLimitMiB: 1024,
-      publicLoadBalancer: true      
+      memoryLimitMiB: 8192,
+      publicLoadBalancer: true,
+      securityGroups: [aggregatorSecurityGroup],
     })
 
     // - Tester
@@ -74,10 +88,10 @@ export class ConstellationRemoteStack extends Stack {
       }
     )
 
-    // this.account
+    const DNS_OF_AGG = aggregatorALBService.loadBalancer.loadBalancerDnsName
 
     testerTaskDef.addContainer('constellation-tester-container', {
-      image: ecs.ContainerImage.fromRegistry("jaricheta/generic-test-placeholder"),
+      image: ecs.ContainerImage.fromRegistry("jaricheta/constellation-load-generator"),
       memoryLimitMiB: 1024,
       containerName: 'constellation-tester-container',
       essential: true, // default for single container taskdefs
@@ -86,7 +100,7 @@ export class ConstellationRemoteStack extends Stack {
         logRetention: 7 // logs expire after 7 days
       }),
       environment: {
-        DNS: aggregatorALBService.loadBalancer.loadBalancerDnsName,
+        OUTPUT: `http://${DNS_OF_AGG}`,
         REGION: this.region,
       }
     })
