@@ -29,6 +29,13 @@ const deprovisionECSServices = async ({ region }) => {
   const cluster = clusters.clusterArns.find((cluster) => {
     return cluster.includes("constellation");
   });
+
+  // if cluster is not found, end function
+  if (!cluster) {
+    console.log("No cluster with `constellation` keyword found");
+    return;
+  }
+
   // iterate through services of cluster and update desired count to 0
   console.log({ cluster });
 
