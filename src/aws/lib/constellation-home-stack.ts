@@ -39,7 +39,7 @@ export class ConstellationHomeStack extends Stack {
 
     // create an s3 bucket
     const constellationS3Bucket = new s3.Bucket(this, "constellation-s3-bucket", {
-      bucketName: `constellation-s3-bucket-${this.account}`,
+      bucketName: `constellation-s3-bucket-${this.account}-${this.region}`,
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
