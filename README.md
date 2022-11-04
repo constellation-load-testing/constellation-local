@@ -1,14 +1,20 @@
 # Development Notes
 
-`deploy:home`
+## Setup
+- [ ] Pull the latest `-local` version from `main`
+- [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io.
+- [ ] After the images have been built, modify the asset names in the remote stack within `-local` to match the link given in docker.io. Note: this is done in two lines in the remote stack `.ts` file.
+- [ ] Attend to: 
+	- [ ] config.json to ensure that you have the correct configurations for the test. IE: Home region, remote region, Duration, VUs per region
+	- [ ] script.js to ensure that you are running the correct test script. 
 
-- Creates home infra
-- Auto uploads `script.js` to S3 bucket
+## Deployment
+- [ ] To only deploy the home region, use `npm run deploy:home` command. This deploys the necessary home components and populates the components with necessary initial states
+- [ ] To fully deploy with the remote regions, use `npm run deploy:all` command. This deploys the home and the remote regions
 
-`destroy:home`
-
-- Clears S3 and Timestream
-- Destroys home infra
+## Teardown
+- [ ] To teardown just the home region, use `npm run destroy:home` - appropriate if only interacting with the home region. 
+- [ ] To teardown the remote region, use `npm run destroy:all` - appropriate if you also built a remote region.
 
 # Orchestrator Workflow
 
