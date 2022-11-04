@@ -21,7 +21,7 @@ export class ConstellationRemoteStack extends Stack {
 
     // add lambda full access to testerRemoteRole - to review
     testerRemoteRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambda_FullAccess"))
-        
+
 
     const aggRemoteRole = new iam.Role(this, 'ecsTaskExecutionRole', {
       assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
@@ -57,14 +57,14 @@ export class ConstellationRemoteStack extends Stack {
 
     // allow all traffic from anywhere to the aggregator - to review
     aggregatorSecurityGroup.addIngressRule(
-      ec2.Peer.anyIpv4(), 
+      ec2.Peer.anyIpv4(),
       ec2.Port.allTraffic()
     )
 
     const aggregatorALBService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'constellation-aggregator', {
       cluster: cluster,
       cpu: 4096,
-      desiredCount: 1,   
+      desiredCount: 1,
       taskImageOptions: {
         image: ecs.ContainerImage.fromRegistry("stevencni/constellation-data-aggregator"),
         containerPort: 3003,
@@ -81,7 +81,7 @@ export class ConstellationRemoteStack extends Stack {
     })
 
     // - Tester
-    const testerTaskDef = new ecs.FargateTaskDefinition(this, 'constellation-task-def', 
+    const testerTaskDef = new ecs.FargateTaskDefinition(this, 'constellation-task-def',
       {
         memoryLimitMiB: 1024,
         cpu: 512,
@@ -104,6 +104,8 @@ export class ConstellationRemoteStack extends Stack {
         OUTPUT: `http://${DNS_OF_AGG}`,
         REGION: this.region,
         HOME_REGION: config.HOME_REGION,
+        VU: String(config.REMOTE_REGIONS[this.region as keyof typeof config.REMOTE_REGIONS]),
+        DURATION: String(config.DURATION),
       }
     })
 

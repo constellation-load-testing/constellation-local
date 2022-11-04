@@ -2,6 +2,7 @@
   "DURATION": 2000,
   "HOME_REGION": "us-east-1",
   "REMOTE_REGIONS": {
-    "us-east-2": 20
+    "us-east-2": 20,
+    "us-west-1": 5
   }
 }
