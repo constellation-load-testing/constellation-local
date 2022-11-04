@@ -66,7 +66,7 @@ export class ConstellationRemoteStack extends Stack {
       cpu: 4096,
       desiredCount: 1,
       taskImageOptions: {
-        image: ecs.ContainerImage.fromRegistry("stevencni/constellation-data-aggregator"),
+        image: ecs.ContainerImage.fromRegistry("athresher/data-aggregator"),
         containerPort: 3003,
         containerName: 'aggregator-container',
         taskRole: aggRemoteRole,
@@ -92,7 +92,7 @@ export class ConstellationRemoteStack extends Stack {
     const DNS_OF_AGG = aggregatorALBService.loadBalancer.loadBalancerDnsName
 
     testerTaskDef.addContainer('constellation-tester-container', {
-      image: ecs.ContainerImage.fromRegistry("stevencni/constellation-load-generator"),
+      image: ecs.ContainerImage.fromRegistry("athresher/load-generator"),
       memoryLimitMiB: 1024,
       containerName: 'constellation-tester-container',
       essential: true, // default for single container taskdefs
