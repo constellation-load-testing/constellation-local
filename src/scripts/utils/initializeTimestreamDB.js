@@ -12,17 +12,27 @@ const createTimestreamDB = async () => {
   };
   try {
     regions.forEach(async (region) => {
-      const params = {
+      const createTests = {
         DatabaseName: "constellation-timestream-db",
-        TableName: region,
+        TableName: `${region}-tests`,
+        RetentionProperties: {
+          MemoryStoreRetentionPeriodInHours: 24,
+          MagneticStoreRetentionPeriodInDays: 7,
+        },
+      };
+      const createCalls = {
+        DatabaseName: "constellation-timestream-db",
+        TableName: `${region}-calls`,
         RetentionProperties: {
           MemoryStoreRetentionPeriodInHours: 24,
           MagneticStoreRetentionPeriodInDays: 7,
         },
       };
       try {
-        const data = await timestreamWrite.send(new CreateTableCommand(params));
-        console.log(data);
+        const createTestsResponse = await timestreamWrite.send(new CreateTableCommand(createTests));
+        const createCallsResponse = await timestreamWrite.send(new CreateTableCommand(createCalls));
+        console.log(createTestsResponse);
+        console.log(createCallsResponse);
       } catch (err) {
         console.log("Error", err);
       }
