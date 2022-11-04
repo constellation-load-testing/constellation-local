@@ -112,7 +112,7 @@ export class ConstellationRemoteStack extends Stack {
     const testerService = new ecs.FargateService(this, 'constellation-tester-service', {
       cluster: cluster,
       taskDefinition: testerTaskDef,
-      desiredCount: 1, // change to >1 when ready
+      desiredCount: 3, // change to >1 when ready
     })
   }
 }
