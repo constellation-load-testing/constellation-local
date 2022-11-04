@@ -1,4 +1,4 @@
-const configParser = require("./configParser.js");
+const configParser = require("../configParser.js");
 const HOME_REGION = configParser.HOME_REGION;
 const AWS = require("aws-sdk");
 const {

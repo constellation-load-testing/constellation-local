@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk");
-const configParser = require("./configParser.js");
+const configParser = require("../configParser.js");
 
 const {
   TimestreamWriteClient,

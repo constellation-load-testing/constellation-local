@@ -1,4 +1,4 @@
-const configParser = require("./configParser.js");
+const configParser = require("../configParser.js");
 const regions = Object.keys(configParser.REMOTE_REGIONS);
 
 // Create a new Timestream database

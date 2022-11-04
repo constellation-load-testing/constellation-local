@@ -1,7 +1,7 @@
 const AWS = require("aws-sdk");
 const path = require("path");
 const fs = require("fs").promises;
-const configParser = require("./configParser.js");
+const configParser = require("../configParser.js");
 
 const s3 = new AWS.S3({
   region: configParser.HOME_REGION,
