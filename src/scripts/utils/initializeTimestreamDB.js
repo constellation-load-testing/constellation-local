@@ -1,11 +1,15 @@
-const regions = require("../../config.json").remoteRegions;
-console.log(regions);
+const configParser = require("../configParser.js");
+const regions = Object.keys(configParser.REMOTE_REGIONS);
+
 // Create a new Timestream database
 const { TimestreamWrite } = require("@aws-sdk/client-timestream-write");
 const { CreateTableCommand } = require("@aws-sdk/client-timestream-write");
 
 const createTimestreamDB = async () => {
-  const timestreamWrite = new TimestreamWrite({ region: "us-west-2" });
+  const timestreamWrite = new TimestreamWrite({ region: configParser.HOME_REGION });
+  const params = {
+    DatabaseName: "constellation-timestream-db",
+  };
   try {
     regions.forEach(async (region) => {
       const createTests = {

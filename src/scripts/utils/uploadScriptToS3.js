@@ -1,9 +1,10 @@
 const AWS = require("aws-sdk");
 const path = require("path");
 const fs = require("fs").promises;
+const configParser = require("../configParser.js");
 
 const s3 = new AWS.S3({
-  region: "us-west-2",
+  region: configParser.HOME_REGION,
 });
 
 const getBucket = async (keyword) => {

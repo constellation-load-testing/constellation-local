@@ -6,7 +6,6 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import { aws_timestream as timestream, RemovalPolicy } from "aws-cdk-lib";
 import { Construct } from 'constructs';
 import * as path from "path"
-import * as config from '../../config.json';
 
 export class ConstellationHomeStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -40,7 +39,7 @@ export class ConstellationHomeStack extends Stack {
 
     // create an s3 bucket
     const constellationS3Bucket = new s3.Bucket(this, "constellation-s3-bucket", {
-      bucketName: `constellation-s3-bucket-${this.account}`,
+      bucketName: `constellation-s3-bucket-${this.account}-${this.region}`,
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
@@ -69,7 +68,7 @@ export class ConstellationHomeStack extends Stack {
       runtime: lambda.Runtime.NODEJS_14_X,
       timeout: Duration.seconds(30),
       environment: {
-        CONSTELLATION_DYNAMODB_TABLE: constellationDynamoDBTable.tableName,
+        HOME_REGION: this.region
       },
       // assign role
       role: lambdaRole,

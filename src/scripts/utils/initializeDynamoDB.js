@@ -4,10 +4,10 @@
  * - completed-regions (empty [] to start)
  * - required-remote-regions (from config)
  */
-const config = require("../../config.json");
+const configParser = require("../configParser.js");
 const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
 
-const HOME_REGION = "us-west-2";
+const HOME_REGION = configParser.HOME_REGION;
 const DYNAMODB_TABLE_NAME = "constellation-dynamodb-table";
 
 const client = new DynamoDBClient({
@@ -46,7 +46,7 @@ const putItem = async (id, data) => {
 
 const run = async () => {
   try {
-    const { remoteRegions } = config;
+    const remoteRegions = Object.keys(configParser.REMOTE_REGIONS);
     await putItem("aggregator-ready-regions", []);
     await putItem("test-completed-regions", []);
     await putItem("required-remote-regions", remoteRegions);

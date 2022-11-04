@@ -1,10 +1,10 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as ecs from "aws-cdk-lib/aws-ecs";
-import { FargateService } from 'aws-cdk-lib/aws-ecs';
 import * as ecs_patterns from "aws-cdk-lib/aws-ecs-patterns";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
+import * as config from '../../config.json';
 
 export class ConstellationRemoteStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -66,12 +66,13 @@ export class ConstellationRemoteStack extends Stack {
       cpu: 4096,
       desiredCount: 1,   
       taskImageOptions: {
-        image: ecs.ContainerImage.fromRegistry("jaricheta/constellation-data-aggregator"),
+        image: ecs.ContainerImage.fromRegistry("stevencni/constellation-data-aggregator"),
         containerPort: 3003,
         containerName: 'aggregator-container',
         taskRole: aggRemoteRole,
         environment: {
           REGION: this.region,
+          HOME_REGION: config.HOME_REGION,
         }
       },
       memoryLimitMiB: 8192,
@@ -91,7 +92,7 @@ export class ConstellationRemoteStack extends Stack {
     const DNS_OF_AGG = aggregatorALBService.loadBalancer.loadBalancerDnsName
 
     testerTaskDef.addContainer('constellation-tester-container', {
-      image: ecs.ContainerImage.fromRegistry("jaricheta/constellation-load-generator"),
+      image: ecs.ContainerImage.fromRegistry("stevencni/constellation-load-generator"),
       memoryLimitMiB: 1024,
       containerName: 'constellation-tester-container',
       essential: true, // default for single container taskdefs
@@ -102,6 +103,7 @@ export class ConstellationRemoteStack extends Stack {
       environment: {
         OUTPUT: `http://${DNS_OF_AGG}`,
         REGION: this.region,
+        HOME_REGION: config.HOME_REGION,
       }
     })
 
