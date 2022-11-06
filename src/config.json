@@ -3,7 +3,10 @@
   "HOME_REGION": "us-east-1",
   "REMOTE_REGIONS": {
     "ca-central-1": 20,
-    "eu-west-3": 10
+    "eu-west-3": 10,
+    "us-east-2": 3,
+    "us-west-1": 5,
+    "us-west-2": 2
   }
 }
 
