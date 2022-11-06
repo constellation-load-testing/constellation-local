@@ -5,6 +5,7 @@ import * as ecs_patterns from "aws-cdk-lib/aws-ecs-patterns";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 import * as config from '../../config.json';
+import { getVUAndDesiredCountByRegion } from '../utils/get-vu-and-desired-count-by-region';
 
 export class ConstellationRemoteStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -90,6 +91,7 @@ export class ConstellationRemoteStack extends Stack {
     )
 
     const DNS_OF_AGG = aggregatorALBService.loadBalancer.loadBalancerDnsName
+    const { VU, desiredCount } = getVUAndDesiredCountByRegion(this.region as keyof typeof config.REMOTE_REGIONS)
 
     testerTaskDef.addContainer('constellation-tester-container', {
       image: ecs.ContainerImage.fromRegistry("athresher/load-generator"),
@@ -104,7 +106,7 @@ export class ConstellationRemoteStack extends Stack {
         OUTPUT: `http://${DNS_OF_AGG}`,
         REGION: this.region,
         HOME_REGION: config.HOME_REGION,
-        VU: String(config.REMOTE_REGIONS[this.region as keyof typeof config.REMOTE_REGIONS]),
+        VU: String(VU),
         DURATION: String(config.DURATION),
       }
     })
@@ -112,7 +114,7 @@ export class ConstellationRemoteStack extends Stack {
     const testerService = new ecs.FargateService(this, 'constellation-tester-service', {
       cluster: cluster,
       taskDefinition: testerTaskDef,
-      desiredCount: 3, // change to >1 when ready
+      desiredCount: desiredCount, // variable based on vu count and region
     })
   }
 }
