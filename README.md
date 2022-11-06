@@ -12,13 +12,12 @@
 ## Deployment
 
 - [ ] To only deploy the home region, use `npm run deploy:home` command. This deploys the necessary home components and populates the components with necessary initial states
-- [ ] To fully deploy with the remote regions, use `npm run deploy:all` command. This deploys the home and the remote regions
-- [ ] Note: if you have more than one remote region, use `npm run deploy:parallel:all` and `npm run destroy:parallel:all`
+- [ ] To fully deploy with the remote regions, use `npm run deploy:all` command. This deploys the home and the remote regions. Consider: `npm run deploy:parallel:all` for parallel deployment of multiple remote regions.
 
 ## Teardown
 
 - [ ] To teardown just the home region, use `npm run destroy:home` - appropriate if only interacting with the home region.
-- [ ] To teardown the remote region, use `npm run destroy:all` - appropriate if you also built a remote region.
+- [ ] To teardown the remote region, use `npm run destroy:all` - run `npm run destroy:parallel:all` for parallel teardown of multiple remote regions
 
 # Orchestrator Workflow
 
