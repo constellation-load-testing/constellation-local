@@ -3,7 +3,24 @@
 ## Setup
 
 - [ ] Pull the latest `-local` version from `main`
-- [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io.
+- [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io. See example script below. NOTE: on `jaricheta` AND `/v1` and `/data-aggregator` file paths. See if `-scr` still has them.
+```bash
+#!/bin/bash
+
+# this stops all docker containers
+docker kill $(docker ps -q)
+# this removes all docker containers
+docker rm $(docker ps -a -q)
+
+# build respective docker images
+## build load generator image
+docker build -t jaricheta/constellation-load-generator:latest ./constellation-load-generator/v1
+docker push jaricheta/constellation-load-generator:latest
+
+## build aggregator image
+docker build -t jaricheta/constellation-data-aggregator:latest ./constellation-data-aggregator/data-aggregator
+docker push jaricheta/constellation-data-aggregator:latest
+```
 - [ ] After the images have been built, modify the asset names in the remote stack within `-local` to match the link given in docker.io. Note: this is done in two lines in the remote stack `.ts` file.
 - [ ] Attend to:
   - [ ] config.json to ensure that you have the correct configurations for the test. IE: Home region, remote region, Duration, VUs per region
