@@ -3,7 +3,7 @@
 ## Setup
 
 - [ ] Pull the latest `-local` version from `main`
-- [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io. See example script below. NOTE: on `jaricheta` AND `/v1` and `/data-aggregator` file paths. See if `-stv` still has them.
+- [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io. See example script below. NOTE: on `jaricheta` AND `/v1` and `/data-aggregator` file paths. See if `-src` still has them.
 ```bash
 #!/bin/bash
 
