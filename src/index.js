@@ -3,24 +3,56 @@
 const cli = require("commander");
 const fs = require("fs").promises;
 const path = require("path");
+const initializeDynamoDB = require("./scripts/utils/initializeDynamoDB.js");
+const initializeTimestreamDB = require("./scripts/utils/initializeTimestreamDB.js");
+
+const { sh } = require("./scripts/utils/sh")
 
 cli.description("Constellation API Load Testing CLI");
 cli.name("constellation");
 
-const fn = async (options) => {
+const init = async (options) => {
   const configPath = options.config;
   console.log(configPath);
 
   // get the contents of the file first from configPath
   const configFile = await fs.readFile(configPath, "utf8");
+  console.log("File fetched from: ", configFile);
 
   // then re-write the file to appropriate path
   await fs.writeFile(path.join(__dirname, "./config.json"), configFile, "utf8");
+  console.log("Config file written to: ", path.join(__dirname, "./config.json"));
 
-  console.log("hello!");
-  console.log(options);
-  // this is where fs write file is going to be given the path.
+  // then bootstraps the required regions
+  // - we want to bootstrap inside the aws folder
+  const awsPath = path.resolve(__dirname, "aws");
+  console.log("AWS Path: ", awsPath);
+
+  await sh(`(cd ${awsPath} && cdk bootstrap)`)
+  console.log("Bootstrapped AWS regions");
+
+  // install the orchestrator node_modules
+  await sh(`(cd ${awsPath}/lambda/orchestrator && npm install)`)
+  console.log("Installed orchestrator node_modules");
+
+  // then deploys the home infrastructure
+  await sh(`(cd ${awsPath} && cdk deploy \"*Home*\")`)
+  console.log("Deployed home infrastructure");
+
+  // then runs the home initialization scripts (excluding the s3 upload)
+  // these all have logs inside at the moment
+  await initializeDynamoDB()
+  await initializeTimestreamDB()
+
 };
+
+cli
+  .command("init")
+  .requiredOption("--config <path>", "Relative path to the config.json file")
+  .description("Initialize the Constellation API Load Testing CLI")
+  .action(init);
+
+cli.parse(process.argv);
 
 /*
 Prior: 
@@ -29,6 +61,7 @@ Prior:
 constellation init --config <path>/config.json
 - What does this do?
   - Writes the config.json to the correct location (in /src)
+  - Bootstraps the required regions
   - Deploys home infra
   - Runs home initialization (without script.js s3 upload)
 
@@ -62,13 +95,5 @@ constellation teardown-all
 
 
 */
-
-cli
-  .command("init")
-  .requiredOption("--config <path>", "Relative path to the config.json file")
-  .description("Run the test script concurrently this number of times.")
-  .action(fn);
-
-cli.parse(process.argv);
 
 // node ./src/index.js
