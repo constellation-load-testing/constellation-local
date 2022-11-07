@@ -21,12 +21,13 @@ docker push jaricheta/constellation-load-generator:latest
 docker build -t jaricheta/constellation-data-aggregator:latest ./constellation-data-aggregator/data-aggregator
 docker push jaricheta/constellation-data-aggregator:latest
 ```
+Within Constellation-Local
 - [ ] After the images have been built, modify the asset names in the remote stack within `-local` to match the link given in docker.io. Note: this is done in two lines in the remote stack `.ts` file.
 - [ ] Attend to:
   - [ ] config.json to ensure that you have the correct configurations for the test. IE: Home region, remote region, Duration, VUs per region
   - [ ] script.js to ensure that you are running the correct test script.
 
-## Deployment
+## Constellation-Local Deployment
 
 - [ ] To only deploy the home region, use `npm run deploy:home` command. This deploys the necessary home components and populates the components with necessary initial states
 - [ ] To fully deploy with the remote regions, use `npm run deploy:all` command. This deploys the home and the remote regions. Consider: `npm run deploy:parallel:all` for parallel deployment of multiple remote regions.
