@@ -5,6 +5,7 @@ import * as ecs_patterns from "aws-cdk-lib/aws-ecs-patterns";
 import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 import * as config from '../../config.json';
+import { getVUAndDesiredCountByRegion } from '../utils/get-vu-and-desired-count-by-region';
 
 export class ConstellationRemoteStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -21,7 +22,7 @@ export class ConstellationRemoteStack extends Stack {
 
     // add lambda full access to testerRemoteRole - to review
     testerRemoteRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("AWSLambda_FullAccess"))
-        
+
 
     const aggRemoteRole = new iam.Role(this, 'ecsTaskExecutionRole', {
       assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com'),
@@ -57,16 +58,16 @@ export class ConstellationRemoteStack extends Stack {
 
     // allow all traffic from anywhere to the aggregator - to review
     aggregatorSecurityGroup.addIngressRule(
-      ec2.Peer.anyIpv4(), 
+      ec2.Peer.anyIpv4(),
       ec2.Port.allTraffic()
     )
 
     const aggregatorALBService = new ecs_patterns.ApplicationLoadBalancedFargateService(this, 'constellation-aggregator', {
       cluster: cluster,
       cpu: 4096,
-      desiredCount: 1,   
+      desiredCount: 1,
       taskImageOptions: {
-        image: ecs.ContainerImage.fromRegistry("stevencni/constellation-data-aggregator"),
+        image: ecs.ContainerImage.fromRegistry("athresher/data-aggregator"),
         containerPort: 3003,
         containerName: 'aggregator-container',
         taskRole: aggRemoteRole,
@@ -81,7 +82,7 @@ export class ConstellationRemoteStack extends Stack {
     })
 
     // - Tester
-    const testerTaskDef = new ecs.FargateTaskDefinition(this, 'constellation-task-def', 
+    const testerTaskDef = new ecs.FargateTaskDefinition(this, 'constellation-task-def',
       {
         memoryLimitMiB: 1024,
         cpu: 512,
@@ -90,9 +91,10 @@ export class ConstellationRemoteStack extends Stack {
     )
 
     const DNS_OF_AGG = aggregatorALBService.loadBalancer.loadBalancerDnsName
+    const { VU, desiredCount } = getVUAndDesiredCountByRegion(this.region as keyof typeof config.REMOTE_REGIONS)
 
     testerTaskDef.addContainer('constellation-tester-container', {
-      image: ecs.ContainerImage.fromRegistry("stevencni/constellation-load-generator"),
+      image: ecs.ContainerImage.fromRegistry("athresher/load-generator"),
       memoryLimitMiB: 1024,
       containerName: 'constellation-tester-container',
       essential: true, // default for single container taskdefs
@@ -104,13 +106,15 @@ export class ConstellationRemoteStack extends Stack {
         OUTPUT: `http://${DNS_OF_AGG}`,
         REGION: this.region,
         HOME_REGION: config.HOME_REGION,
+        VU: String(VU),
+        DURATION: String(config.DURATION),
       }
     })
 
     const testerService = new ecs.FargateService(this, 'constellation-tester-service', {
       cluster: cluster,
       taskDefinition: testerTaskDef,
-      desiredCount: 3, // change to >1 when ready
+      desiredCount: desiredCount, // variable based on vu count and region
     })
   }
 }

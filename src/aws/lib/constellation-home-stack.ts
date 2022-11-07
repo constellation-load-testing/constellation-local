@@ -63,7 +63,7 @@ export class ConstellationHomeStack extends Stack {
       functionName: "constellation-orchestrator-lambda",
       code: lambda.Code.fromAsset(
         path.join(__dirname, "../lambda/orchestrator")
-        ),
+      ),
       handler: "index.handler",
       runtime: lambda.Runtime.NODEJS_14_X,
       timeout: Duration.seconds(30),
