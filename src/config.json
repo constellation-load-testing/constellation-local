@@ -1,9 +1,8 @@
 {
-  "DURATION": 2000,
+  "DURATION": 333001,
   "HOME_REGION": "us-east-1",
   "REMOTE_REGIONS": {
     "ap-northeast-1": 5,
     "us-east-2": 202
   }
 }
-
