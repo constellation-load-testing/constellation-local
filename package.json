@@ -29,15 +29,16 @@
     "@types/jest": "^27.5.2",
     "@types/node": "10.17.27",
     "@types/prettier": "2.6.0",
-    "aws-cdk": "2.46.0",
     "jest": "^27.5.1",
     "ts-jest": "^27.1.4",
     "ts-node": "^10.9.1",
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "aws-cdk": "2.46.0",
     "@aws-sdk/client-dynamodb": "^3.199.0",
     "@aws-sdk/client-s3": "^3.198.0",
+    "@aws-sdk/client-sts": "^3.204.0",
     "@aws-sdk/client-timestream-query": "^3.198.0",
     "@aws-sdk/client-timestream-write": "^3.201.0",
     "aws-cdk-lib": "2.46.0",

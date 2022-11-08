@@ -27,8 +27,20 @@ const init = async (options) => {
   
   await sh(`(cd ${awsPath} && cdk bootstrap)`)
   console.log("Bootstrapped AWS regions");
-  // put a delay for the bootstrap to be ready in the aws side, hopefully this is enough
-  await new Promise(resolve => setTimeout(resolve, 10000));
+
+  // The issue here is that while the CDKToolkit stack is created in cloudformation, the staging bucket is not guaranteed to be created. A workaround is to:
+  // 1. Check if the bucket is created
+  // 2. Create the bucket if it is not created 
+  // -- Requirements for bucket creation?
+  // -- -- Deploy the bucket on the correct region
+  // -- -- Match the staging bucket pattern
+  // -- -- cdk-hnb659fds-assets-625527221604-us-east-1
+  // -- -- cdk-XXXXXXXXX-assets-YYYYYYYYYYYY-ZZZZZZZZZ where X = hash(cdk version?), Y = account number, Z = region
+  // -- -- Constraint, X is a hash that is possibly a cdk version specific, thus must be hardcoded in! The hash has been seen as `hnb659fds` across different accounts in different regions. 
+  // Hopefully, this will circumnavigate the S3 specific errors
+  const s3StagingBucketCheck = require("./scripts/utils/S3StagingBucketCheck.js");
+  await s3StagingBucketCheck();
+  console.log("Staging Bucket Check Complete");
 
   // install the orchestrator node_modules
   await sh(`(cd ${awsPath}/lambda/orchestrator && npm install)`)
@@ -42,9 +54,8 @@ const init = async (options) => {
   // these all have logs inside at the moment
   const initializeDynamoDB = require("./scripts/utils/initializeDynamoDB.js");
   const initializeTimestreamDB = require("./scripts/utils/initializeTimestreamDB.js");
-  await initializeDynamoDB()
-  await initializeTimestreamDB()
-
+  await initializeDynamoDB();
+  await initializeTimestreamDB();
 };
 
 cli
@@ -198,5 +209,3 @@ constellation teardown-all
 
 
 */
-
-// node ./src/index.js
