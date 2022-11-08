@@ -3,8 +3,6 @@
 const cli = require("commander");
 const fs = require("fs").promises;
 const path = require("path");
-const initializeDynamoDB = require("./scripts/utils/initializeDynamoDB.js");
-const initializeTimestreamDB = require("./scripts/utils/initializeTimestreamDB.js");
 
 const { sh } = require("./scripts/utils/sh")
 
@@ -13,34 +11,37 @@ cli.name("constellation");
 
 const init = async (options) => {
   const configPath = options.config;
-  console.log(configPath);
-
+  
   // get the contents of the file first from configPath
   const configFile = await fs.readFile(configPath, "utf8");
   console.log("File fetched from: ", configFile);
-
-  // then re-write the file to appropriate path
+  
+  // write the file to appropriate path
   await fs.writeFile(path.join(__dirname, "./config.json"), configFile, "utf8");
   console.log("Config file written to: ", path.join(__dirname, "./config.json"));
-
-  // then bootstraps the required regions
+  
+  // bootstrap the required regions
   // - we want to bootstrap inside the aws folder
   const awsPath = path.resolve(__dirname, "aws");
   console.log("AWS Path: ", awsPath);
-
+  
   await sh(`(cd ${awsPath} && cdk bootstrap)`)
   console.log("Bootstrapped AWS regions");
+  // put a delay for the bootstrap to be ready in the aws side, hopefully this is enough
+  await new Promise(resolve => setTimeout(resolve, 10000));
 
   // install the orchestrator node_modules
   await sh(`(cd ${awsPath}/lambda/orchestrator && npm install)`)
   console.log("Installed orchestrator node_modules");
-
-  // then deploys the home infrastructure
+  
+  // deploy the home infrastructure
   await sh(`(cd ${awsPath} && cdk deploy \"*Home*\")`)
   console.log("Deployed home infrastructure");
-
-  // then runs the home initialization scripts (excluding the s3 upload)
+  
+  // run the home initialization scripts (excluding the s3 upload)
   // these all have logs inside at the moment
+  const initializeDynamoDB = require("./scripts/utils/initializeDynamoDB.js");
+  const initializeTimestreamDB = require("./scripts/utils/initializeTimestreamDB.js");
   await initializeDynamoDB()
   await initializeTimestreamDB()
 
@@ -51,6 +52,108 @@ cli
   .requiredOption("--config <path>", "Relative path to the config.json file")
   .description("Initialize the Constellation API Load Testing CLI")
   .action(init);
+
+const runTest = async (options) => {
+  const testPath = options.script;
+
+  // get the contents of the file first from testPath
+  const testFile = await fs.readFile(testPath, "utf8");
+  console.log("File fetched from: ", testFile);
+
+  // write the file to appropriate path
+  await fs.writeFile(path.join(__dirname, "./script.js"), testFile, "utf8");
+  console.log("Config file written to: ", path.join(__dirname, "./script.js"));
+
+  // upload to s3
+  const createS3AndUploadScript = require("./scripts/utils/createS3AndUploadScript.js");
+  await createS3AndUploadScript();
+  console.log("Uploaded script to S3");
+
+  // Deploy remote regions (in parallel)
+  const config = require("./config.json");
+  const REMOTE_REGIONS = Object.keys(config.REMOTE_REGIONS) 
+  const awsPath = path.resolve(__dirname, "aws");
+  console.log("AWS Path: ", awsPath);
+
+
+  const shellPromises = REMOTE_REGIONS.map(region => {
+    const command = `(cd ${awsPath} && cdk deploy -f \"*${region}*\")`
+    return sh(command)
+      .then(() => {
+        console.log(`Deployed ${region} infrastructure`);
+      })
+      .catch(err => {
+        console.log(`Error deploying ${region} infrastructure`, err);
+      })
+  })
+  
+  await Promise.allSettled(shellPromises);
+  console.log("Deployed remote regions");  
+
+}
+
+cli
+  .command("run-test")
+  .requiredOption("--script <path>", "Relative path to the script.js file")
+  .description("Running the test script")
+  .action(runTest);
+
+const homeDestroy = async () => {
+  // clean up home components before destroying
+  const clearAndDeleteS3 = require("./scripts/utils/clearAndDeleteS3.js");
+  const clearTimestream = require("./scripts/utils/clearTimestream.js");
+  await clearAndDeleteS3();
+  await clearTimestream();
+
+  // destroy home infrastructure
+  const awsPath = path.resolve(__dirname, "aws");
+  console.log("AWS Path: ", awsPath);
+
+  await sh(`(cd ${awsPath} && cdk destroy -f \"*Home*\")`);
+  console.log("Destroyed home infrastructure");
+}
+
+cli
+  .command("teardown-home")
+  .description("Command tears down the home infrastructure")
+  .action(homeDestroy);
+
+const remoteDestroy = async () => {
+  // Deploy remote regions (in parallel)
+  const config = require("./config.json");
+  const REMOTE_REGIONS = Object.keys(config.REMOTE_REGIONS) 
+  const awsPath = path.resolve(__dirname, "aws");
+  console.log("AWS Path: ", awsPath);
+
+
+  const shellPromises = REMOTE_REGIONS.map(region => {
+    const command = `(cd ${awsPath} && cdk destroy -f \"*${region}*\")`
+    return sh(command)
+      .then(() => {
+        console.log(`Destroyed ${region} infrastructure`);
+      })
+      .catch(err => {
+        console.log(`Error destroying ${region} infrastructure`, err);
+      })
+  })
+  
+  await Promise.allSettled(shellPromises);
+  console.log("Destroyed remote regions");
+}
+
+cli
+  .command("teardown-remote")
+  .description("Destroys the remote region(s) infrastructure")
+  .action(remoteDestroy);
+
+cli
+  .command("teardown-all")
+  .description("Destroys all infrastructure")
+  .action(async () => {
+    await remoteDestroy();
+    await homeDestroy();
+    console.log("Destroyed all infrastructure");
+  });
 
 cli.parse(process.argv);
 

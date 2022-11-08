@@ -4,7 +4,7 @@ const sleep = async (ms) => {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
-}
+};
 
 export const script = async (axiosInstance) => {
   await axiosInstance.post(

@@ -21,12 +21,12 @@ const sh = async (cmd, output = true) => {
       } else {
         reject(`child process closed with code ${code}`);
       }
-      console.log(`child process closed with code ${code}`);
+      // console.log(`child process closed with code ${code}`);
     });
 
     child.on("exit", (code) => {
       resolve();
-      console.log(`child process exited with code ${code}`);
+      // console.log(`child process exited with code ${code}`);
     });
 
     child.on("error", (err) => {

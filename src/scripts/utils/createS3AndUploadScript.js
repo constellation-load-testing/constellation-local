@@ -68,7 +68,9 @@ const createAndGetBucket = async (bucketName) => {
     
     // create bucket
     await createBucket(bucketName);
-    
+    // after creating bucket, put a delay to allow bucket to be registered in AWS
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+
     const bucket = await getBucket(bucketName);
     
     if (bucket) {
