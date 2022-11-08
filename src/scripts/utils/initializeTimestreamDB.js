@@ -60,9 +60,6 @@ const createTimestreamDB = async () => {
       delayMs(500);
     }
   } catch (err) {
-    /*
-    if err is of "type" ThrottlingException, then wait 1 second and try again -- recursively
-    */
     console.log("Error", err);
   }
 };

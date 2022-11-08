@@ -16,6 +16,8 @@ const timestreamWriteClient = new TimestreamWriteClient({
   region: configParser.HOME_REGION,
 });
 
+const delayMs = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const getDatabase = async (keyword) => {
   try {
     const databases = await timestreamWrite.listDatabases().promise();
@@ -63,7 +65,13 @@ const clearDatabase = async (DatabaseName) => {
     clearDatabase(DatabaseName);
 
   } catch (err) {
-    console.log("Error", err);
+    if (err.name === "ThrottlingException") {
+      console.log("ThrottlingException. Waiting 1 second and trying again.");
+      await delayMs(1000);
+      await clearDatabase(DatabaseName);
+    } else {
+      console.log("Error", err);
+    }    
   }
 };
 
@@ -76,8 +84,8 @@ const run = async () => {
     }
     await clearDatabase(database.DatabaseName);
 		await timestreamWriteClient.send(new DeleteDatabaseCommand({ DatabaseName: database.DatabaseName }));
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
   }
 };
 
