@@ -4,7 +4,7 @@
 
 const { sh } = require("./utils/sh");
 const path = require("path");
-const config = require("./configParser");
+const config = require("../config.json");
 const REMOTE_REGIONS = Object.keys(config.REMOTE_REGIONS);
 
 const destroyRemoteInfraParallel = async () => {

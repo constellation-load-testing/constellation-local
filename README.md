@@ -1,9 +1,133 @@
 # Development Notes
 
-## Setup
+## CLI-Setup
+
+- [ ] Pull the latest `-local` version from `main`
+- [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io. See example script below. NOTE: on `jaricheta`. You need to change this to your OWN docker.io username otherwise this will fail
+
+```bash
+#!/bin/bash
+
+# this stops all docker containers
+docker kill $(docker ps -q)
+# this removes all docker containers
+docker rm $(docker ps -a -q)
+
+# build respective docker images
+## build load generator image
+docker build -t jaricheta/constellation-load-generator:latest ./constellation-load-generator
+docker push jaricheta/constellation-load-generator:latest
+
+## build aggregator image
+docker build -t jaricheta/constellation-data-aggregator:latest ./constellation-data-aggregator
+docker push jaricheta/constellation-data-aggregator:latest
+```
+
+Within Constellation-Local
+
+- [ ] After the images have been built, modify the asset names in the remote stack within `-local` to match the link given in docker.io. Note: this is done in two lines in the remote stack `.ts` file.
+  - Go to `/constellation-local/src/aws/lib/constellation-remote-stack.ts` and search two places for `image: ecs.ContainerImage.fromRegistry("<YOUR-IMAGE>")`
+- [ ] Attend to - with the CLI implementation, this does not need to be located at `/src` anymore.
+  - [ ] `config.json` to ensure that you have the correct configurations for the test. IE: Home region, remote region, Duration, VUs per region
+  - [ ] `script.js` to ensure that you are running the correct test script.
+
+## CLI
+
+> Developer Notes: As this is not YET an npm package, replace `constellation` with `node ./src/index.js` 🙏🙏
+
+### For the lazy
+
+- End to end: Create config.json & script.js anywhere (doesn't matter)
+  - `init --config <path>` -> `run-test --script <path>` -> `teardown-all`
+  - OR
+  - `init --config <path>` -> `run-test --script <path>` -> `teardown-home` -> `teardown-remote`
+- Only Home: Create config.json anywhere (doesn't matter)
+  - `init --config <path>` -> `teardown-home`
+
+### Requirements
+
+- [ ] Tell user to create a json file to be used as configuration for our deployment. README of source code will tell user how to format this json file. See example format below:
+- [ ] Double check that the home region is a region that has available timestream database AWS service. This includes:
+  - `us-east-1`, `us-east-2`, `us-west-2`, `ap-southeast-3`, `ap-southeast-2`, `ap-northeast-1`, `eu-central-1`, `eu-west-1`
+
+```json
+{
+  "DURATION": 20000,
+  "HOME_REGION": "eu-central-1",
+  "REMOTE_REGIONS": {
+    "ap-northeast-1": 5,
+    "us-east-2": 202,
+    "ca-central-1": 777,
+    "eu-west-1": 5,
+    "ap-northeast-3": 5
+  }
+}
+```
+
+### Initialization
+
+- [ ] `constellation init --config <path>`
+  - `<path>` is the relative path to the json file in question
+  - Background prcesses What does this do?
+    - Writes the config file as `config.json` to the correct location (in /src) for our code to read from
+    - Bootstraps the required regions
+    - Runs the staging bucket check (to hopefully mend bootstrapping errors)
+    - Deploys home infrastructure
+    - Runs home initialization (without script.js s3 upload)
+  - Message to user:
+    - Any appropriate status messages to the user upon deployment (can take 50-60s)
+    - Now ready to run test via `run-test` command. And refer to documentation (README) on how to create the `.js` file
+
+### Running the Test
+
+- [ ] `constellation run-test --script <path>`
+  - `<path>` is the relative path to the test script file in question
+  - Whats does this do?
+    - Writes the script file as `script.js` to the correct location (in /src)
+    - Create s3 bucket (if needed) and uploads script.js to s3
+    - Deploy remote regions (in parallel)
+  - Message to user:
+    - Any appropriate messages to the user while this is running (can take 200-300s)
+    - Notify the user that the test is now running. And that can be visualized accordingly. Use `constellation visualize`.
+    - Notify that the user is free to teardown the infrastructure at anytime with:
+      - `constellation teardown-all`
+      - `constellation teardown-home`
+      - `constellation teardown-remote`
+
+- [ ] `constellation visualize`
+  - @jake to be completed
+
+- [ ] `constellation <other-commands>`
+  - To be discussed
+
+### Teardown
+
+- [ ] `constellation teardown-home`
+  - Whats does this do?
+    - Run home cleanup scripts (clears s3 and timestream)
+    - Destroys home region
+    - Note: this also teardown timestream database - therefore, data disappears
+  - Notify the user that this will also delete the timestream database data
+
+- [ ] `constellation teardown-remote`
+  - Whats does this do?
+    - Parallel destruction of remote region(s)
+
+- [ ] `constellation teardown-all`
+  - What does this do?
+    - Parallel destruction of remote region(s)
+    - Runs home cleanup scripts
+    - Destroys home region
+    - Done.
+  - Notify the user that this will also delete the timestream database data
+
+## NPM-oriented Setup
+
+> Note: This workflow is discouraged but should theoretically still work. This workflow is reserved to developers only and will be deleted when possible
 
 - [ ] Pull the latest `-local` version from `main`
 - [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io. See example script below. NOTE: on `jaricheta` AND `/v1` and `/data-aggregator` file paths. See if `-src` still has them.
+
 ```bash
 #!/bin/bash
 
@@ -21,7 +145,9 @@ docker push jaricheta/constellation-load-generator:latest
 docker build -t jaricheta/constellation-data-aggregator:latest ./constellation-data-aggregator/data-aggregator
 docker push jaricheta/constellation-data-aggregator:latest
 ```
+
 Within Constellation-Local
+
 - [ ] After the images have been built, modify the asset names in the remote stack within `-local` to match the link given in docker.io. Note: this is done in two lines in the remote stack `.ts` file.
 - [ ] Attend to:
   - [ ] config.json to ensure that you have the correct configurations for the test. IE: Home region, remote region, Duration, VUs per region

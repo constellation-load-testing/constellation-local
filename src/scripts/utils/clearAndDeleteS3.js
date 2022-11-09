@@ -1,5 +1,5 @@
-const configParser = require("../configParser.js");
-const HOME_REGION = configParser.HOME_REGION;
+const config = require("../../config.json")
+const HOME_REGION = config.HOME_REGION;
 const AWS = require("aws-sdk");
 const {
   S3Client,
