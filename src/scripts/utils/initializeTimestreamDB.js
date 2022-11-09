@@ -1,12 +1,12 @@
-const configParser = require("../configParser.js");
-const regions = Object.keys(configParser.REMOTE_REGIONS);
+const config = require("../../config.json");
+const regions = Object.keys(config.REMOTE_REGIONS);
 
 // Create a new Timestream database
 const { TimestreamWrite } = require("@aws-sdk/client-timestream-write");
 const { CreateTableCommand } = require("@aws-sdk/client-timestream-write");
 
 const timestreamWrite = new TimestreamWrite({
-  region: configParser.HOME_REGION,
+  region: config.HOME_REGION,
 });
 
 const delayMs = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

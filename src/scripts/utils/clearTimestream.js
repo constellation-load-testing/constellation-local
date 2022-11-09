@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk");
-const configParser = require("../configParser.js");
+const config = require("../../config.json");
 
 const {
   TimestreamWriteClient,
@@ -9,11 +9,11 @@ const {
 } = require("@aws-sdk/client-timestream-write");
 
 const timestreamWrite = new AWS.TimestreamWrite({
-  region: configParser.HOME_REGION,
+  region: config.HOME_REGION,
 });
 
 const timestreamWriteClient = new TimestreamWriteClient({
-  region: configParser.HOME_REGION,
+  region: config.HOME_REGION,
 });
 
 const delayMs = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

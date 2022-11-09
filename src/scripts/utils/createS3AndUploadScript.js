@@ -1,10 +1,10 @@
 const AWS = require("aws-sdk");
 const path = require("path");
 const fs = require("fs").promises;
-const configParser = require("../configParser.js");
+const config = require("../../config.json");
 
 const s3 = new AWS.S3({
-  region: configParser.HOME_REGION,
+  region: config.HOME_REGION,
 });
 
 // create s3 bucket
@@ -94,7 +94,7 @@ const run = async () => {
     if (!bucket) {
       console.log("Warning. Bucket with 'constellation' keyword not found, attempting to create a placeholder bucket");
       // bucket name specific to (home) region
-      const bucketName = `constellation-s3-bucket-${configParser.HOME_REGION}`;
+      const bucketName = `constellation-s3-bucket-${config.HOME_REGION}`;
   
       // create and get a new bucket 
       // - note that this bucket name does not have the account number on the constellation-s3-bucket suffix

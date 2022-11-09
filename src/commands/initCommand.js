@@ -1,8 +1,11 @@
 const fs = require("fs").promises;
 const { sh } = require("../scripts/utils/sh");
 const path = require("path");
+const gradient = require("gradient-string");
+const { logo } = require("../constants/logo.js");
 
 const init = async (options) => {
+  console.log(gradient.summer(logo));
   const configPath = options.config;
 
   // get the contents of the file first from configPath
