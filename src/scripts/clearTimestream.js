@@ -1,11 +1,11 @@
 const AWS = require("aws-sdk");
-const config = require("../../config.json");
+const config = require("../config.json");
 
 const {
   TimestreamWriteClient,
   ListTablesCommand,
   DeleteTableCommand,
-	DeleteDatabaseCommand
+  DeleteDatabaseCommand,
 } = require("@aws-sdk/client-timestream-write");
 
 const timestreamWrite = new AWS.TimestreamWrite({
@@ -33,7 +33,7 @@ const getDatabase = async (keyword) => {
 // clear timestream database
 const clearDatabase = async (DatabaseName) => {
   try {
-		const databaseParams = { DatabaseName };
+    const databaseParams = { DatabaseName };
     const data = await timestreamWriteClient.send(
       new ListTablesCommand(databaseParams)
     );
@@ -63,7 +63,6 @@ const clearDatabase = async (DatabaseName) => {
     // - base case is `if (!tablesArr)`, ie: eventually no tables in db
     console.log("Note. Recursion to check if tables are deleted...");
     clearDatabase(DatabaseName);
-
   } catch (err) {
     if (err.name === "ThrottlingException") {
       console.log("ThrottlingException. Waiting 1 second and trying again.");
@@ -71,19 +70,21 @@ const clearDatabase = async (DatabaseName) => {
       await clearDatabase(DatabaseName);
     } else {
       console.log("Error", err);
-    }    
+    }
   }
 };
 
 const run = async () => {
   try {
-		const database = await getDatabase("constellation");
+    const database = await getDatabase("constellation");
     if (!database) {
       console.log("No timestream database found");
       return;
     }
     await clearDatabase(database.DatabaseName);
-		await timestreamWriteClient.send(new DeleteDatabaseCommand({ DatabaseName: database.DatabaseName }));
+    await timestreamWriteClient.send(
+      new DeleteDatabaseCommand({ DatabaseName: database.DatabaseName })
+    );
   } catch (err) {
     console.log(err);
   }

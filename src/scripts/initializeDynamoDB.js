@@ -4,7 +4,7 @@
  * - completed-regions (empty [] to start)
  * - required-remote-regions (from config)
  */
-const config = require("../../config.json");
+const config = require("../config.json");
 const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
 
 const HOME_REGION = config.HOME_REGION;

@@ -1,4 +1,4 @@
-const config = require("../../config.json")
+const config = require("../config.json");
 const HOME_REGION = config.HOME_REGION;
 const AWS = require("aws-sdk");
 const {
@@ -72,12 +72,14 @@ const deleteBucket = async (bucket) => {
 const run = async () => {
   try {
     // bucket name specific to (home) region
-    const bucketName = `constellation`;    
+    const bucketName = `constellation`;
 
     const buckets = await getBucketsByKeyword(bucketName);
 
     if (!buckets.length === 0) {
-      console.log(`Note. No S3 bucket(s) with name including: ${bucketName} found`);
+      console.log(
+        `Note. No S3 bucket(s) with name including: ${bucketName} found`
+      );
       return;
     }
 
@@ -87,7 +89,6 @@ const run = async () => {
       await clearBucket(bucket);
       await deleteBucket(bucket);
     }
-
   } catch (e) {
     console.log(e);
   }

@@ -1,10 +1,10 @@
 const path = require("path");
-const { sh } = require("../scripts/utils/sh");
+const { sh } = require("../scripts/sh");
 
 const teardownHome = async () => {
   // clean up home components before destroying
-  const clearAndDeleteS3 = require("../scripts/utils/clearAndDeleteS3.js");
-  const clearTimestream = require("../scripts/utils/clearTimestream.js");
+  const clearAndDeleteS3 = require("../scripts/clearAndDeleteS3.js");
+  const clearTimestream = require("../scripts/clearTimestream.js");
   await clearAndDeleteS3();
   await clearTimestream();
 

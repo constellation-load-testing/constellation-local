@@ -9,21 +9,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "bootstrap": "cd ./src/aws && cdk bootstrap && cd ../..",
-    "visualize": "node frontend/server.js",
-    "install:orchestrator": "cd ./src/aws/lambda/orchestrator && npm install && cd ../../../..",
-    "deploy:home:awsonly": "npm run bootstrap && npm run install:orchestrator && cd ./src/aws && cdk deploy \"*Home*\" && cd ../..",
-    "destroy:home:awsonly": "cd ./src/aws && cdk destroy -f \"*Home*\" && cd ../..",
-    "deploy:remote:awsonly": "cd ./src/aws && cdk deploy \"*Remote*\" && cd ../..",
-    "destroy:remote:awsonly": "cd ./src/aws && cdk destroy -f \"*Remote*\" && cd ../..",
-    "deploy:scripts": "node ./src/scripts/deployScripts.js",
-    "destroy:scripts": "node ./src/scripts/destroyScripts.js",
-    "deploy:home": "npm run deploy:home:awsonly && npm run deploy:scripts",
-    "destroy:home": "npm run destroy:scripts && npm run destroy:home:awsonly",
-    "deploy:all": "npm run deploy:home && npm run deploy:remote:awsonly",
-    "destroy:all": "npm run destroy:remote:awsonly && npm run destroy:home",
-    "deploy:parallel:all": "npm run deploy:home && node ./src/scripts/deployRemoteInfraParallel.js",
-    "destroy:parallel:all": "node ./src/scripts/destroyRemoteInfraParallel.js && npm run destroy:home"
+    "visualize": "node frontend/server.js"
   },
   "devDependencies": {
     "@types/jest": "^27.5.2",

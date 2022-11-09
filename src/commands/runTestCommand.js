@@ -1,5 +1,5 @@
 const fs = require("fs").promises;
-const { sh } = require("../scripts/utils/sh");
+const { sh } = require("../scripts/sh");
 const path = require("path");
 
 const runTest = async (options) => {
@@ -14,7 +14,7 @@ const runTest = async (options) => {
   console.log("Config file written to: ", path.join(__dirname, "../script.js"));
 
   // upload to s3
-  const createS3AndUploadScript = require("../scripts/utils/createS3AndUploadScript.js");
+  const createS3AndUploadScript = require("../scripts/createS3AndUploadScript.js");
   await createS3AndUploadScript();
   console.log("Uploaded script to S3");
 

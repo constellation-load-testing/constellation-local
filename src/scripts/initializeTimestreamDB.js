@@ -1,4 +1,4 @@
-const config = require("../../config.json");
+const config = require("../config.json");
 const regions = Object.keys(config.REMOTE_REGIONS);
 
 // Create a new Timestream database

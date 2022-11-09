@@ -1,5 +1,5 @@
 const path = require("path");
-const { sh } = require("../scripts/utils/sh");
+const { sh } = require("../scripts/sh");
 
 const teardownRemote = async () => {
   // Deploy remote regions (in parallel)
