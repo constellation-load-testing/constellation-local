@@ -13,7 +13,9 @@ const runTest = async (options) => {
 
   // isDev, if truthy, will show the raw logs, hidden from user
   devLog(options);
-  process.env.LOG_LEVEL = options.log;
+  if (options.log) {
+    process.env.LOG_LEVEL = "raw";
+  }
   const isRaw = process.env.LOG_LEVEL === "raw" ? true : false;
 
   // ORA

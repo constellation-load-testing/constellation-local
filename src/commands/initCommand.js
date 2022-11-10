@@ -15,7 +15,10 @@ const init = async (options) => {
 
   // isDev, if truthy, will show the raw logs, hidden from user
   devLog(options);
-  process.env.LOG_LEVEL = options.log;
+  // options.log is either true or false
+  if (options.log) {
+    process.env.LOG_LEVEL = "raw";
+  }
   const isRaw = process.env.LOG_LEVEL === "raw" ? true : false;
 
   console.log(gradient.summer(logo));
@@ -85,9 +88,7 @@ const init = async (options) => {
     `Home Region Components (${HOME_REGION}) -🟢 Initialized`
   );
 
-  header.text = appendMsg(
-    "Completed Initialization, ready for running test... 📜"
-  );
+  header.text = appendMsg("Completed Initialization, ready to run test... 📜");
   header.stopAndPersist({
     symbol: "✅ ",
   });

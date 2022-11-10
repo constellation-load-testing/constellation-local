@@ -6,6 +6,7 @@ const {
   ListObjectsCommand,
   DeleteObjectCommand,
 } = require("@aws-sdk/client-s3");
+const { devLog } = require("./loggers");
 
 const s3 = new AWS.S3({
   region: HOME_REGION,
@@ -24,7 +25,7 @@ const getBucketsByKeyword = async (keyword) => {
 
     return returnBuckets;
   } catch (e) {
-    console.log(e);
+    devLog(e);
   }
 };
 
@@ -36,7 +37,7 @@ const clearBucket = async (bucket) => {
     let noOfObjects = data.Contents;
     if (!noOfObjects) {
       // if no objects in bucket
-      console.log("No objects in bucket");
+      devLog("No objects in bucket");
       return;
     }
 
@@ -50,9 +51,9 @@ const clearBucket = async (bucket) => {
       );
     }
 
-    console.log(`Success. S3 Objects from ${bucket.Name} cleared.`);
+    devLog(`Success. S3 Objects from ${bucket.Name} cleared.`);
   } catch (err) {
-    console.log("Error", err);
+    devLog("Error", err);
   }
 };
 
@@ -63,9 +64,9 @@ const deleteBucket = async (bucket) => {
   };
   try {
     await s3.deleteBucket(params).promise();
-    console.log(`Success. S3 bucket: ${bucket.Name} deleted.`);
+    devLog(`Success. S3 bucket: ${bucket.Name} deleted.`);
   } catch (err) {
-    console.log(`Error. Unable to delete bucket ${bucket.Name}:`, err);
+    devLog(`Error. Unable to delete bucket ${bucket.Name}:`, err);
   }
 };
 
@@ -77,9 +78,7 @@ const run = async () => {
     const buckets = await getBucketsByKeyword(bucketName);
 
     if (!buckets.length === 0) {
-      console.log(
-        `Note. No S3 bucket(s) with name including: ${bucketName} found`
-      );
+      devLog(`Note. No S3 bucket(s) with name including: ${bucketName} found`);
       return;
     }
 
@@ -90,7 +89,7 @@ const run = async () => {
       await deleteBucket(bucket);
     }
   } catch (e) {
-    console.log(e);
+    devLog(e);
   }
 };
 

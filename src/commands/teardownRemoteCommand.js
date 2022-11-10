@@ -1,26 +1,33 @@
 const path = require("path");
 const { sh } = require("../scripts/sh");
+const { devLog } = require("../scripts/loggers");
 
-const teardownRemote = async () => {
+const teardownRemote = async (options) => {
+  devLog(options);
+  if (options.log) {
+    process.env.LOG_LEVEL = "raw";
+  }
+  const isRaw = process.env.LOG_LEVEL === "raw" ? true : false;
+
   // Deploy remote regions (in parallel)
   const config = require("../config.json");
   const REMOTE_REGIONS = Object.keys(config.REMOTE_REGIONS);
   const awsPath = path.resolve(__dirname, "..", "aws");
-  console.log("AWS Path: ", awsPath);
+  devLog("AWS Path: ", awsPath);
 
   const shellPromises = REMOTE_REGIONS.map((region) => {
     const command = `(cd ${awsPath} && cdk destroy -f \"*${region}*\")`;
-    return sh(command)
+    return sh(command, isRaw)
       .then(() => {
-        console.log(`Destroyed ${region} infrastructure`);
+        devLog(`Destroyed ${region} infrastructure`);
       })
       .catch((err) => {
-        console.log(`Error destroying ${region} infrastructure`, err);
+        devLog(`Error destroying ${region} infrastructure`, err);
       });
   });
 
   await Promise.allSettled(shellPromises);
-  console.log("Destroyed remote regions");
+  devLog("Destroyed remote regions");
 };
 
 module.exports = teardownRemote;
