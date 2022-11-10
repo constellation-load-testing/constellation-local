@@ -1,11 +1,32 @@
 const fs = require("fs").promises;
-const { sh } = require("../scripts/sh");
 const path = require("path");
+const { sh } = require("../scripts/sh");
+const {
+  createOraInstance,
+  initMsgManipulation,
+} = require("./helpers/cliHelpers.js");
 
 const runTest = async (options) => {
-  const testPath = options.script;
+  const { ora, chalk } = await require("./helpers/esmodules.js")();
+
+  // isDev, if truthy, will show the raw logs, hidden from user
+  devLog(options);
+  process.env.LOG_LEVEL = options.log;
+  const isRaw = process.env.LOG_LEVEL === "raw" ? true : false;
+
+  // ORA
+  const header = createOraInstance(ora, {
+    text: chalk.hex("#f7a11b").bold("Running Constellation Test"),
+    spinner: "earth",
+  }).start();
+
+  const { appendMsg, replaceMsg } = initMsgManipulation(
+    chalk.hex("#fddb45"),
+    header
+  );
 
   // get the contents of the file first from testPath
+  const testPath = options.script;
   const testFile = await fs.readFile(testPath, "utf8");
   console.log("File fetched from: ", testFile);
 
@@ -26,7 +47,7 @@ const runTest = async (options) => {
 
   const shellPromises = REMOTE_REGIONS.map((region) => {
     const command = `(cd ${awsPath} && cdk deploy -f \"*${region}*\")`;
-    return sh(command)
+    return sh(command, isRaw)
       .then(() => {
         console.log(`Deployed ${region} infrastructure`);
       })
