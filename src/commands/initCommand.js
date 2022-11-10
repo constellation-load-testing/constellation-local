@@ -19,6 +19,7 @@ const init = async (options) => {
 
   console.log(gradient.summer(logo));
 
+  // ORA
   const header = createOraInstance(ora, {
     text: chalk.hex("#f7a11b").bold("Initializing Constellation"),
     spinner: "earth",
@@ -53,19 +54,27 @@ const init = async (options) => {
   devLog("Installed orchestrator node_modules");
   header.text = replaceMsg("Home Stack Assets -🟢 Installed");
 
-  // TODO: Display home region to the user
   // TODO: Display expected deployment time (or even pct to complete due to predictability of dep-duration)
-  header.text = appendMsg("Home Region Infrastructure -🟠 Deploying");
+  const HOME_REGION = require("../config.json").HOME_REGION;
+  header.text = appendMsg(
+    `Home Region Infrastructure (${HOME_REGION}) -🟠 Deploying`
+  );
   await sh(`(cd ${awsPath} && cdk deploy \"*Home*\")`, isRaw);
   devLog("Deployed home infrastructure");
-  header.text = replaceMsg("Home Region Infrastructure -🟢 Deployed");
+  header.text = replaceMsg(
+    `Home Region Infrastructure (${HOME_REGION}) -🟢 Deployed`
+  );
 
-  header.text = appendMsg("Home Region Components -🟠 Initializing");
+  header.text = appendMsg(
+    `Home Region Components (${HOME_REGION}) -🟠 Initializing`
+  );
   const initializeDynamoDB = require("../scripts/initializeDynamoDB.js");
   const initializeTimestreamDB = require("../scripts/initializeTimestreamDB.js");
   await initializeDynamoDB();
   await initializeTimestreamDB();
-  header.text = replaceMsg("Home Region Components -🟢 Initialized");
+  header.text = replaceMsg(
+    `Home Region Components (${HOME_REGION}) -🟢 Initialized`
+  );
 
   header.text = appendMsg("Completed Initialization");
   header.stopAndPersist({
