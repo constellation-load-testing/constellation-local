@@ -1,6 +1,7 @@
 const AWS = require("aws-sdk");
 const path = require("path");
 const fs = require("fs").promises;
+const { devLog } = require("./loggers");
 const config = require("../config.json");
 
 const s3 = new AWS.S3({
@@ -14,9 +15,9 @@ const createBucket = async (bucketName) => {
   };
   try {
     await s3.createBucket(params).promise();
-    console.log(`Bucket ${bucketName} created.`);
+    devLog(`Bucket ${bucketName} created.`);
   } catch (err) {
-    console.log(`Error creating bucket ${bucketName}:`, err);
+    devLog(`Error creating bucket ${bucketName}:`, err);
   }
 };
 
@@ -29,7 +30,7 @@ const getBucket = async (keyword) => {
 
     return bucket;
   } catch (e) {
-    console.log(e);
+    devLog(e);
   }
 };
 
@@ -44,7 +45,7 @@ const getFromBucket = async (params) => {
 
     return response.Body.toString(); // buffer to string
   } catch (e) {
-    console.log({
+    devLog({
       message: "Unable to get from bucket",
       error: e,
     });
@@ -55,7 +56,7 @@ const putToBucket = async (params) => {
   try {
     const response = await s3.putObject(params).promise();
   } catch (e) {
-    console.log({
+    devLog({
       message: "Unable to upload to bucket",
       error: e,
     });
@@ -74,10 +75,10 @@ const createAndGetBucket = async (bucketName) => {
     const bucket = await getBucket(bucketName);
 
     if (bucket) {
-      console.log("Bucket named", bucketName, "confirmed created");
+      devLog("Bucket named", bucketName, "confirmed created");
       return bucket;
     } else {
-      console.log(
+      devLog(
         "Bucket named",
         bucketName,
         "not found, attempting to create - again"
@@ -85,7 +86,7 @@ const createAndGetBucket = async (bucketName) => {
       return await createAndGetBucket();
     }
   } catch (e) {
-    console.log(e);
+    devLog(e);
   }
 };
 
@@ -95,7 +96,7 @@ const run = async () => {
     let bucket = await getBucket("constellation");
 
     if (!bucket) {
-      console.log(
+      devLog(
         "Warning. Bucket with 'constellation' keyword not found, attempting to create a placeholder bucket"
       );
       // bucket name specific to (home) region
@@ -106,7 +107,7 @@ const run = async () => {
       // - thus in danger of being non-unique across multiple users, thus only used if CDK failed to create 'constellation' bucket
       bucket = await createAndGetBucket(bucketName);
     } else {
-      console.log(
+      devLog(
         "Success. Bucket with 'constellation' keyword found, confirmed created by CDK"
       );
     }
@@ -125,9 +126,9 @@ const run = async () => {
 
     await putToBucket(bucketParams);
     const response = await getFromBucket(bucketParams);
-    console.log("Success. Script uploaded to S3 bucket:", { response });
+    devLog("Success. Script uploaded to S3 bucket:", { response });
   } catch (e) {
-    console.log(e);
+    devLog(e);
   }
 };
 

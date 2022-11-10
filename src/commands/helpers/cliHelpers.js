@@ -24,6 +24,10 @@ const createOraInstance = (ora, { text, spinner }) => {
 
 // chalk.hex("#fddb45")
 const initMsgManipulation = (chalkFn, oraInstance) => {
+  /**
+   * appends a message to the current ora instance
+   * @param {string} message
+   */
   const appendMsg = (message) => {
     const newOraInstanceText =
       oraInstance.text + "\n" + chalkFn(`✨  ${message}`);
@@ -31,11 +35,30 @@ const initMsgManipulation = (chalkFn, oraInstance) => {
     return newOraInstanceText;
   };
 
-  const replaceMsg = (message) => {
+  /**
+   * replaceMsg replaces a part of the message with a new message given a supplied keyword
+   * @param {string} message whole message, delimited by "\n"
+   * @param {string} keyword keyword searched
+   */
+  const replaceMsg = (message, keyword) => {
     // split by "\n"
     const textArr = oraInstance.text.split("\n");
+    let ind = textArr.length - 1;
+    if (keyword) {
+      // reverse is required incase that home region and remote region are the same, therefore duplicated keyword (also has other utilities)
+      // need to revese the array to find the last occurence of the keyword
+      // is a shallow copy to prevent mutation
+      let tmpTextArr = [...textArr].reverse();
+      let tmp = tmpTextArr.findIndex((txt) => txt.includes(keyword));
+      // if not -1, then keyword found
+      if (tmp !== -1) {
+        let reverseInd = tmp;
+        // transform to actual unrevesed index for ind
+        ind = textArr.length - 1 - reverseInd;
+      }
+    }
     // replace last element with message
-    textArr[textArr.length - 1] = chalkFn(`✨  ${message}`);
+    textArr[ind] = chalkFn(`✨  ${message}`);
     const newOraInstanceText = textArr.join("\n");
     return newOraInstanceText;
   };
@@ -46,7 +69,56 @@ const initMsgManipulation = (chalkFn, oraInstance) => {
   };
 };
 
+/**
+ * intervaled message manipulation, mutates the header text!
+ * @param {appendMsg} function that appends a message to the header
+ * @param {replaceMsg} function that replaces a message in the header
+ * @param {import("ora").Ora} oraInstance needs to be a started ora instance
+ * @param {string} message message to be displayed, apends " (n%)"
+ * @param {string} keyword keyword to look for when replacing specific text
+ * @param {number} minMS minimum millisecond interval - expected duration
+ * @param {number} maxMS maximum millisecond interval - expected duration, Keep this "wide" from minMS
+ */
+const intervalledMsgManipulation = ({
+  appendMsg,
+  replaceMsg,
+  oraInstance,
+  initialMessage,
+  keyword,
+  minMS,
+  maxMS,
+}) => {
+  // NOTE fn side-effect - initial mutation of passed ora instance!
+  oraInstance.text = appendMsg(initialMessage);
+  // iife
+  const randDurationInMS = ((min, max) => {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  })(minMS, maxMS);
+
+  // if / 10 - increments by 10%, if / 20 - increments by 5%
+  const increments = 5;
+  const intervalDurationInMS = randDurationInMS / (100 / increments);
+
+  let counter = 0;
+  const intervalId = setInterval(() => {
+    // increment counter
+    counter += increments;
+    // dont allow counter to exceed 100 - increments
+    if (counter > 100 - increments) {
+      counter = 100 - increments;
+    }
+
+    // previous header message is need not be observed (which decreases coupling)
+    const newMessage = `${initialMessage} (${counter}%)`;
+    // NOTE fn side-effect - intervalled mutation of passed ora instance!
+    oraInstance.text = replaceMsg(newMessage, keyword);
+  }, intervalDurationInMS);
+
+  return intervalId;
+};
+
 module.exports = {
   createOraInstance,
   initMsgManipulation,
+  intervalledMsgManipulation,
 };

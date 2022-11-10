@@ -1,15 +1,14 @@
-const rawLog = (message, logger = console.log) => {
+const rawLog = (message) => {
   if (process.env.LOG_LEVEL !== "raw") return;
 
-  logger("📜", message);
+  console.log("📜", message);
 };
 
-const devLog = (message, logger = console.log) => {
+const devLog = (message) => {
   if (!(process.env.LOG_LEVEL === "dev" || process.env.LOG_LEVEL === "raw")) {
     return;
   }
-
-  logger("🔍", message);
+  console.log("🔍", message);
 };
 
 // guaranteed user-level logs are not used here

@@ -7,6 +7,7 @@ const { logo } = require("../constants/logo.js");
 const {
   createOraInstance,
   initMsgManipulation,
+  intervalledMsgManipulation,
 } = require("./helpers/cliHelpers.js");
 
 const init = async (options) => {
@@ -21,7 +22,7 @@ const init = async (options) => {
 
   // ORA
   const header = createOraInstance(ora, {
-    text: chalk.hex("#f7a11b").bold("Initializing Constellation"),
+    text: chalk.hex("#f7a11b").bold("Initializing Constellation..."),
     spinner: "earth",
   }).start();
 
@@ -30,6 +31,7 @@ const init = async (options) => {
     header
   );
 
+  // MESSAGES & PROCESSES
   header.text = appendMsg("Config json file -🟠 Validating");
   const configPath = options.config;
   await readWriteConfigFile(configPath);
@@ -54,15 +56,22 @@ const init = async (options) => {
   devLog("Installed orchestrator node_modules");
   header.text = replaceMsg("Home Stack Assets -🟢 Installed");
 
-  // TODO: Display expected deployment time (or even pct to complete due to predictability of dep-duration)
   const HOME_REGION = require("../config.json").HOME_REGION;
-  header.text = appendMsg(
-    `Home Region Infrastructure (${HOME_REGION}) -🟠 Deploying`
-  );
+  const intervalId = intervalledMsgManipulation({
+    appendMsg,
+    replaceMsg,
+    oraInstance: header,
+    initialMessage: `Home Region Infrastructure (${HOME_REGION}) -🟠 Deploying`,
+    keyword: HOME_REGION,
+    minMS: 50 * 1000,
+    maxMS: 70 * 1000,
+  });
+
   await sh(`(cd ${awsPath} && cdk deploy \"*Home*\")`, isRaw);
   devLog("Deployed home infrastructure");
+  clearInterval(intervalId);
   header.text = replaceMsg(
-    `Home Region Infrastructure (${HOME_REGION}) -🟢 Deployed`
+    `Home Region Infrastructure (${HOME_REGION}) -🟢 Deployed (100%)`
   );
 
   header.text = appendMsg(
@@ -76,10 +85,13 @@ const init = async (options) => {
     `Home Region Components (${HOME_REGION}) -🟢 Initialized`
   );
 
-  header.text = appendMsg("Completed Initialization");
+  header.text = appendMsg(
+    "Completed Initialization, ready for running test... 📜"
+  );
   header.stopAndPersist({
     symbol: "✅ ",
   });
+  return;
 };
 
 module.exports = init;
