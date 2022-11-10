@@ -38,6 +38,7 @@
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "gradient-string": "^2.0.2",
+    "ora": "^6.1.2",
     "path": "^0.12.7"
   }
 }

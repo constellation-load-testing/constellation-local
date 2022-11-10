@@ -4,9 +4,10 @@ const {
   ListBucketsCommand,
   CreateBucketCommand,
 } = require("@aws-sdk/client-s3");
-const config = require("../config.json");
-
 const stsClient = new STSClient({});
+
+const config = require("../config.json");
+const { devLog } = require("./loggers");
 
 const ALL_REGIONS = Array.from(
   new Set(Object.keys(config.REMOTE_REGIONS).concat(config.HOME_REGION))
@@ -52,7 +53,7 @@ const s3StagingBucketCheck = async () => {
     });
 
     if (bucketExists) {
-      console.log(
+      devLog(
         `Bootstrapping bucket exists in ${region}, no manual creation required`
       );
       continue;
@@ -65,9 +66,9 @@ const s3StagingBucketCheck = async () => {
       };
       try {
         await s3ClientOnRegion.send(new CreateBucketCommand(params));
-        console.log(`Bucket MANUALLY ${bucketName} created.`);
+        devLog(`Bucket MANUALLY ${bucketName} created.`);
       } catch (err) {
-        console.log(`Error creating bucket ${bucketName}:`, err);
+        devLog(`Error creating bucket ${bucketName}:`, err);
       }
     };
 
