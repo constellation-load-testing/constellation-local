@@ -34,6 +34,7 @@ Within Constellation-Local
 ## CLI
 
 > Developer Notes: As this is not YET an npm package, replace `constellation` with `node ./src/index.js` 🙏🙏
+> For all commands add a `--log` flag if you want to see the raw logs
 
 ### For the lazy
 
