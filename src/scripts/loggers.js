@@ -1,7 +1,7 @@
 const rawLog = (message, logger = console.log) => {
   if (process.env.LOG_LEVEL !== "raw") return;
 
-  logger(`📜 ${message}`);
+  logger("📜", message);
 };
 
 const devLog = (message, logger = console.log) => {
@@ -9,7 +9,7 @@ const devLog = (message, logger = console.log) => {
     return;
   }
 
-  logger(`🔍 ${message}`);
+  logger("🔍", message);
 };
 
 // guaranteed user-level logs are not used here

@@ -1,5 +1,6 @@
 const config = require("../config.json");
 const regions = Object.keys(config.REMOTE_REGIONS);
+const { devLog } = require("./loggers");
 
 // Create a new Timestream database
 const { TimestreamWrite } = require("@aws-sdk/client-timestream-write");
@@ -16,14 +17,14 @@ const tryTableCreation = async (params) => {
     const createTableResponse = await timestreamWrite.send(
       new CreateTableCommand(params)
     );
-    // console.log(createTableResponse);
+    // devLog(createTableResponse);
   } catch (err) {
     if (err.name === "ThrottlingException") {
-      console.log("ThrottlingException. Waiting 1 second and trying again.");
+      devLog("ThrottlingException. Waiting 1 second and trying again.");
       await delayMs(1000);
       await tryTableCreation(params);
     } else {
-      console.log("Error", err);
+      devLog("Error", err);
     }
   }
 };
@@ -51,16 +52,16 @@ const createTimestreamDB = async () => {
         },
       };
       const createTestsResponse = await tryTableCreation(createTests);
-      // console.log(createTestsResponse);
-      console.log(`Success. Timestream Table: ${region}-tests created.`);
+      // devLog(createTestsResponse);
+      devLog(`Success. Timestream Table: ${region}-tests created.`);
       delayMs(500);
       const createCallsResponse = await tryTableCreation(createCalls);
-      // console.log(createCallsResponse);
-      console.log(`Success. Timestream Table: ${region}-calls created.`);
+      // devLog(createCallsResponse);
+      devLog(`Success. Timestream Table: ${region}-calls created.`);
       delayMs(500);
     }
   } catch (err) {
-    console.log("Error", err);
+    devLog("Error", err);
   }
 };
 

@@ -6,6 +6,7 @@
  */
 const config = require("../config.json");
 const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
+const { devLog } = require("./loggers");
 
 const HOME_REGION = config.HOME_REGION;
 const DYNAMODB_TABLE_NAME = "constellation-dynamodb-table";
@@ -40,7 +41,7 @@ const putItem = async (id, data) => {
     const command = new PutItemCommand(params);
     await client.send(command);
   } catch (e) {
-    console.log(e);
+    devLog(e);
   }
 };
 
@@ -54,11 +55,9 @@ const run = async () => {
       state: false,
       timestamp: "",
     });
-    console.log(
-      "Success. Initialized Dynamodb Schema and recorded remote regions."
-    );
+    devLog("Success. Initialized Dynamodb Schema and recorded remote regions.");
   } catch (e) {
-    console.log(e);
+    devLog(e);
   }
 };
 

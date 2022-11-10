@@ -11,32 +11,6 @@ cli.description("Constellation API Load Testing CLI");
 cli.name("constellation");
 
 cli
-  .command("tmp")
-  .option("--log [type]", "Optional, level of log output. Use: dev, raw")
-  .action(async (options) => {
-    // commonJS - ES module migration
-    const { ora, chalk } = await require("./commands/esmodules.js")();
-
-    const loggers = require("./scripts/loggers");
-    console.log(options);
-    const log = options.log;
-    if (log === "raw") {
-      process.env.LOG_LEVEL = "raw";
-    }
-    loggers.rawLog("hello world");
-
-    const spinner = ora(chalk.blue("Loading unicorns")).start();
-
-    setTimeout(() => {
-      spinner.color = "yellow";
-      spinner.text = "Loading rainbows";
-    }, 1000);
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    spinner.stop();
-  });
-
-cli
   .command("init")
   .requiredOption("--config <path>", "Relative path to the config.json file")
   .option("--log [type]", "Optional, level of log output. Use: dev, raw")
