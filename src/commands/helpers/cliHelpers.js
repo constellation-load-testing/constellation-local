@@ -89,7 +89,7 @@ const intervalledMsgManipulation = ({
   maxMS,
 }) => {
   // NOTE fn side-effect - initial mutation of passed ora instance!
-  oraInstance.text = appendMsg(initialMessage);
+  oraInstance.text = appendMsg(initialMessage + " (0%)");
   // iife
   const randDurationInMS = ((min, max) => {
     return Math.floor(Math.random() * (max - min + 1) + min);

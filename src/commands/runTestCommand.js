@@ -11,7 +11,7 @@ const {
 const runTest = async (options) => {
   const { ora, chalk } = await require("./helpers/esmodules.js")();
 
-  // isDev, if truthy, will show the raw logs, hidden from user
+  // LOG CONFIGS
   devLog(options);
   if (options.log) {
     process.env.LOG_LEVEL = "raw";
@@ -57,7 +57,7 @@ const runTest = async (options) => {
       appendMsg,
       replaceMsg,
       oraInstance: header,
-      initialMessage: `Remote Region Infrastructure (${region}) -🟠 Deploying (0%)`,
+      initialMessage: `Remote Region Infrastructure (${region}) -🟠 Deploying`,
       keyword: region,
       minMS: 300 * 1000,
       maxMS: 400 * 1000, // conservative range is 300 to 400s for each region
@@ -77,7 +77,7 @@ const runTest = async (options) => {
         devLog(`Error deploying ${region} infrastructure`, err);
         clearInterval(intervalId);
         header.text = replaceMsg(
-          `Remote Region Infrastructure (${region}) -🔴 Failed! - Please wait for all deployment to finish and run teardown-all command`,
+          `Remote Region Infrastructure (${region}) -🔴 Failed! - Please wait for all deployment to finish and run teardown-all command or visit the CloudFormation AWS and manually delete the stacks`,
           region
         );
       });

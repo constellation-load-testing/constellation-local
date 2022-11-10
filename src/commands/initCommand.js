@@ -78,14 +78,14 @@ const init = async (options) => {
   );
 
   header.text = appendMsg(
-    `Home Region Components (${HOME_REGION}) -🟠 Initializing`
+    `Initializing Home Region Components (${HOME_REGION}) -🟠 Initializing`
   );
   const initializeDynamoDB = require("../scripts/initializeDynamoDB.js");
   const initializeTimestreamDB = require("../scripts/initializeTimestreamDB.js");
   await initializeDynamoDB();
   await initializeTimestreamDB();
   header.text = replaceMsg(
-    `Home Region Components (${HOME_REGION}) -🟢 Initialized`
+    `Initializing Home Region Components (${HOME_REGION}) -🟢 Initialized`
   );
 
   header.text = appendMsg("Completed Initialization, ready to run test... 📜");

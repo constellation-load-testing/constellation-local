@@ -8,6 +8,5 @@ const devLog = (...message) => {
 // guaranteed user-level logs are not used here
 
 module.exports = {
-  rawLog,
   devLog,
 };
