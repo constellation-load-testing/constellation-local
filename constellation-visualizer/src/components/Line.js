@@ -22,31 +22,54 @@ ChartJS.register(
 
 
 function LineGraph(data, region) {
-	const options = {
-		responsive: true,
-		plugins: {
-			legend: {
-				position: 'bottom',
-			},
-			title: {
-				display: true,
-				text: region,
-			},
-		},
-	};
-	const labels = data[region].tests.map(d => d.time);
-	const averageLatency = data[region].tests.map(d => d.runtime);
-	const lineGraphData = {
-		labels,
-		datasets: [
-			{
-				label: "Avg. Test Runtime",
-				data: averageLatency,
-				borderColor: 'rgb(0, 99, 132)',
-				backgroundColor: 'rgb(0, 99, 132)'
-			}
+  const options =  { 
+    scales: {
+      yAxes: {
+        title: {
+          display: true,
+          text: "Milliseconds",
+          font: {
+            size: 15
+          }
+        },
+        ticks: {
+          precision: 0
+        }
+      },
+      xAxes: {
+        title: {
+          display: true,
+          text: "Time",
+          font: {
+            size: 15
+          }
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        position: 'bottom',
+      },
+      title: {
+        display: true,
+        text: region,
+      },
+    }
+  }
+
+  const labels = data[region].tests.map(d => d.time);
+  const averageLatency = data[region].tests.map(d => d.runtime);
+  const lineGraphData = {
+    labels,
+    datasets: [
+      {
+        label: "Avg. Test Runtime",
+        data: averageLatency,
+        borderColor: 'rgb(0, 99, 132)',
+        backgroundColor: 'rgb(0, 99, 132)'
+      }
     ],
-	};
-	return <Line options={options} data={lineGraphData} />;
+  };
+  return <Line options={options} data={lineGraphData} />;
 }
 export default LineGraph;

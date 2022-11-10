@@ -21,8 +21,31 @@ ChartJS.register(
 
 
 function BarGraph (input, region) {
-  const options = {
-    responsive: true,
+
+  const options =  { 
+    scales: {
+      yAxes: {
+        title: {
+          display: true,
+          text: "Requests",
+          font: {
+            size: 15
+          }
+        },
+        ticks: {
+          precision: 0
+        }
+      },
+      xAxes: {
+        title: {
+          display: true,
+          text: "URL",
+          font: {
+            size: 15
+          }
+        }
+      }
+    },
     plugins: {
       legend: {
         position: 'bottom',
@@ -31,8 +54,8 @@ function BarGraph (input, region) {
         display: true,
         text: region,
       },
-    },
-  };
+    }
+  }
   const urlLabels = Object.keys(input[region].calls);
   const data = {
     labels: urlLabels,
