@@ -20,7 +20,7 @@ ChartJS.register(
 
 
 
-const BarGraph = (input, region) => {
+function BarGraph (input, region) {
   const options = {
     responsive: true,
     plugins: {
