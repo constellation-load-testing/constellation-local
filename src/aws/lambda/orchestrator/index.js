@@ -42,7 +42,7 @@ const lambdaFn = async (event) => {
       await recordTestCompletedRegions(event);
       // deprovision ecs services - can be done based on region
       // TODO: enable for production
-      // await deprovisionECSServices(event);
+      await deprovisionECSServices(event);
       return { statusCode: 200 };
     } else if (type === "test-reset") {
       // reset test state
