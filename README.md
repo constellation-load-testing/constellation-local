@@ -34,6 +34,7 @@ Within Constellation-Local
 ## CLI
 
 > Developer Notes: As this is not YET an npm package, replace `constellation` with `node ./src/index.js` 🙏🙏
+> For all commands add a `--log` flag if you want to see the raw logs
 
 ### For the lazy
 
@@ -46,7 +47,8 @@ Within Constellation-Local
 
 ### Requirements
 
-- [ ] Tell user to create a json file to be used as configuration for our deployment. README of source code will tell user how to format this json file. See example format below:
+- [ ] Tell user that for whichever regions they want to test from, ensure that their AWS account with allowed to run in that region for smooth deployment. See - [Managing AWS Regions](https://docs.aws.amazon.com/general/latest/gr/rande-manage.html)
+- [ ] Tell user to create a json file to be used as configuration for our deployment. README of source code will tell user how to format this json file. See example format below ~
 - [ ] Double check that the home region is a region that has available timestream database AWS service. This includes:
   - `us-east-1`, `us-east-2`, `us-west-2`, `ap-southeast-3`, `ap-southeast-2`, `ap-northeast-1`, `eu-central-1`, `eu-west-1`
 
@@ -81,6 +83,7 @@ Within Constellation-Local
 ### Running the Test
 
 - [ ] `constellation run-test --script <path>`
+
   - `<path>` is the relative path to the test script file in question
   - Whats does this do?
     - Writes the script file as `script.js` to the correct location (in /src)
@@ -95,6 +98,7 @@ Within Constellation-Local
       - `constellation teardown-remote`
 
 - [ ] `constellation visualize`
+
   - @jake to be completed
 
 - [ ] `constellation <other-commands>`
@@ -103,6 +107,7 @@ Within Constellation-Local
 ### Teardown
 
 - [ ] `constellation teardown-home`
+
   - Whats does this do?
     - Run home cleanup scripts (clears s3 and timestream)
     - Destroys home region
@@ -110,6 +115,7 @@ Within Constellation-Local
   - Notify the user that this will also delete the timestream database data
 
 - [ ] `constellation teardown-remote`
+
   - Whats does this do?
     - Parallel destruction of remote region(s)
 
@@ -120,48 +126,6 @@ Within Constellation-Local
     - Destroys home region
     - Done.
   - Notify the user that this will also delete the timestream database data
-
-## NPM-oriented Setup
-
-> Note: This workflow is discouraged but should theoretically still work. This workflow is reserved to developers only and will be deleted when possible
-
-- [ ] Pull the latest `-local` version from `main`
-- [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io. See example script below. NOTE: on `jaricheta` AND `/v1` and `/data-aggregator` file paths. See if `-src` still has them.
-
-```bash
-#!/bin/bash
-
-# this stops all docker containers
-docker kill $(docker ps -q)
-# this removes all docker containers
-docker rm $(docker ps -a -q)
-
-# build respective docker images
-## build load generator image
-docker build -t jaricheta/constellation-load-generator:latest ./constellation-load-generator/v1
-docker push jaricheta/constellation-load-generator:latest
-
-## build aggregator image
-docker build -t jaricheta/constellation-data-aggregator:latest ./constellation-data-aggregator/data-aggregator
-docker push jaricheta/constellation-data-aggregator:latest
-```
-
-Within Constellation-Local
-
-- [ ] After the images have been built, modify the asset names in the remote stack within `-local` to match the link given in docker.io. Note: this is done in two lines in the remote stack `.ts` file.
-- [ ] Attend to:
-  - [ ] config.json to ensure that you have the correct configurations for the test. IE: Home region, remote region, Duration, VUs per region
-  - [ ] script.js to ensure that you are running the correct test script.
-
-## Constellation-Local Deployment
-
-- [ ] To only deploy the home region, use `npm run deploy:home` command. This deploys the necessary home components and populates the components with necessary initial states
-- [ ] To fully deploy with the remote regions, use `npm run deploy:all` command. This deploys the home and the remote regions. Consider: `npm run deploy:parallel:all` for parallel deployment of multiple remote regions.
-
-## Teardown
-
-- [ ] To teardown just the home region, use `npm run destroy:home` - appropriate if only interacting with the home region.
-- [ ] To teardown the remote region, use `npm run destroy:all` - run `npm run destroy:parallel:all` for parallel teardown of multiple remote regions
 
 # Orchestrator Workflow
 

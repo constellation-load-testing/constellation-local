@@ -1,60 +1,98 @@
-const fs = require("fs").promises;
-const { sh } = require("../scripts/utils/sh");
 const path = require("path");
 const gradient = require("gradient-string");
+const readWriteConfigFile = require("../scripts/readWriteConfigFile");
+const { sh } = require("../scripts/sh");
+const { devLog } = require("../scripts/loggers");
 const { logo } = require("../constants/logo.js");
+const {
+  createOraInstance,
+  initMsgManipulation,
+  intervalledMsgManipulation,
+} = require("./helpers/cliHelpers.js");
 
 const init = async (options) => {
+  const { ora, chalk } = await require("./helpers/esmodules.js")();
+
+  // isDev, if truthy, will show the raw logs, hidden from user
+  devLog(options);
+  // options.log is either true or false
+  if (options.log) {
+    process.env.LOG_LEVEL = "raw";
+  }
+  const isRaw = process.env.LOG_LEVEL === "raw" ? true : false;
+
   console.log(gradient.summer(logo));
-  const configPath = options.config;
 
-  // get the contents of the file first from configPath
-  const configFile = await fs.readFile(configPath, "utf8");
-  console.log("File fetched from: ", configFile);
+  // ORA
+  const header = createOraInstance(ora, {
+    text: chalk.hex("#f7a11b").bold("Initializing Constellation..."),
+    spinner: "earth",
+  }).start();
 
-  // write the file to appropriate path
-  await fs.writeFile(path.join(__dirname, "../config.json"), configFile, "utf8");
-  console.log(
-    "Config file written to: ",
-    path.join(__dirname, "..", "config.json")
+  const { appendMsg, replaceMsg } = initMsgManipulation(
+    chalk.hex("#fddb45"),
+    header
   );
 
-  // bootstrap the required regions
-  // - we want to bootstrap inside the aws folder
-  const awsPath = path.resolve(__dirname, ".." ,"aws");
-  console.log("AWS Path: ", awsPath);
+  // MESSAGES & PROCESSES
+  header.text = appendMsg("Config json file -🟠 Validating");
+  const configPath = options.config;
+  await readWriteConfigFile(configPath);
+  header.text = replaceMsg("Config json file -🟢 Validated");
 
-  await sh(`(cd ${awsPath} && cdk bootstrap)`);
-  console.log("Bootstrapped AWS regions");
+  const awsPath = path.resolve(__dirname, "..", "aws");
+  devLog(`Changing directory to AWS: ${awsPath}`);
 
-  // The issue here is that while the CDKToolkit stack is created in cloudformation, the staging bucket is not guaranteed to be created. A workaround is to:
-  // 1. Check if the bucket is created
-  // 2. Create the bucket if it is not created
-  // -- Requirements for bucket creation?
-  // -- -- Deploy the bucket on the correct region
-  // -- -- Match the staging bucket pattern
-  // -- -- cdk-hnb659fds-assets-625527221604-us-east-1
-  // -- -- cdk-XXXXXXXXX-assets-YYYYYYYYYYYY-ZZZZZZZZZ where X = hash(cdk version?), Y = account number, Z = region
-  // -- -- Constraint, X is a hash that is possibly a cdk version specific, thus must be hardcoded in! The hash has been seen as `hnb659fds` across different accounts in different regions.
-  // Hopefully, this will circumnavigate the S3 specific errors
-  const s3StagingBucketCheck = require("../scripts/utils/S3StagingBucketCheck.js");
+  header.text = appendMsg("AWS CDK Bootstrap -🟠 Processing");
+  await sh(`(cd ${awsPath} && cdk bootstrap)`, isRaw);
+  devLog(`Bootstrap complete`);
+  header.text = replaceMsg("AWS CDK Bootstrap -🟢 Completed");
+
+  header.text = appendMsg("AWS CDK Bootstrap Manual Checks -🟠 Processing");
+  const s3StagingBucketCheck = require("../scripts/S3StagingBucketCheck.js");
   await s3StagingBucketCheck();
-  console.log("Staging Bucket Check Complete");
+  devLog("Staging Bucket Check Complete");
+  header.text = replaceMsg("AWS CDK Bootstrap Manual Checks -🟢 Completed");
 
-  // install the orchestrator node_modules
-  await sh(`(cd ${awsPath}/lambda/orchestrator && npm install)`);
-  console.log("Installed orchestrator node_modules");
+  header.text = appendMsg("Home Stack Assets -🟠 Installing");
+  await sh(`(cd ${awsPath}/lambda/orchestrator && npm install)`, isRaw);
+  devLog("Installed orchestrator node_modules");
+  header.text = replaceMsg("Home Stack Assets -🟢 Installed");
 
-  // deploy the home infrastructure
-  await sh(`(cd ${awsPath} && cdk deploy \"*Home*\")`);
-  console.log("Deployed home infrastructure");
+  const HOME_REGION = require("../config.json").HOME_REGION;
+  const intervalId = intervalledMsgManipulation({
+    appendMsg,
+    replaceMsg,
+    oraInstance: header,
+    initialMessage: `Home Region Infrastructure (${HOME_REGION}) -🟠 Deploying`,
+    keyword: HOME_REGION,
+    minMS: 50 * 1000,
+    maxMS: 70 * 1000,
+  });
 
-  // run the home initialization scripts (excluding the s3 upload)
-  // these all have logs inside at the moment
-  const initializeDynamoDB = require("../scripts/utils/initializeDynamoDB.js");
-  const initializeTimestreamDB = require("../scripts/utils/initializeTimestreamDB.js");
+  await sh(`(cd ${awsPath} && cdk deploy \"*Home*\")`, isRaw);
+  devLog("Deployed home infrastructure");
+  clearInterval(intervalId);
+  header.text = replaceMsg(
+    `Home Region Infrastructure (${HOME_REGION}) -🟢 Deployed (100%)`
+  );
+
+  header.text = appendMsg(
+    `Initializing Home Region Components (${HOME_REGION}) -🟠 Initializing`
+  );
+  const initializeDynamoDB = require("../scripts/initializeDynamoDB.js");
+  const initializeTimestreamDB = require("../scripts/initializeTimestreamDB.js");
   await initializeDynamoDB();
   await initializeTimestreamDB();
+  header.text = replaceMsg(
+    `Initializing Home Region Components (${HOME_REGION}) -🟢 Initialized`
+  );
+
+  header.text = appendMsg("Completed Initialization, ready to run test... 📜");
+  header.stopAndPersist({
+    symbol: "✅ ",
+  });
+  return;
 };
 
 module.exports = init;

@@ -3,8 +3,8 @@ const childProcess = require("child_process");
 /**
  * @param {string} command
  * @param {string} output default true, this determines if output is streamed to the console. set to false if you want to suppress output
- * @returns {Promise<undefined>} 
-*/
+ * @returns {Promise<undefined>}
+ */
 const sh = async (cmd, output = true) => {
   return new Promise((resolve, reject) => {
     const child = childProcess.exec(cmd);
@@ -19,14 +19,16 @@ const sh = async (cmd, output = true) => {
       if (code === 0) {
         resolve();
       } else {
-        reject(`child process closed with code ${code}`);
+        reject();
       }
-      // console.log(`child process closed with code ${code}`);
     });
 
     child.on("exit", (code) => {
-      resolve();
-      // console.log(`child process exited with code ${code}`);
+      if (code === 0) {
+        resolve();
+      } else {
+        reject();
+      }
     });
 
     child.on("error", (err) => {
