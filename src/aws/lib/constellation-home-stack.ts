@@ -50,7 +50,8 @@ export class ConstellationHomeStack extends Stack {
         name: "id",
         type: dynamodb.AttributeType.STRING,
       },
-
+      // increase RCU to deal with traffic
+      readCapacity: 100,
       // add other properties
       removalPolicy: RemovalPolicy.DESTROY,
     });
