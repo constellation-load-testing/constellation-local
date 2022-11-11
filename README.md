@@ -3,7 +3,7 @@
 ## CLI-Setup
 
 - [ ] Pull the latest `-local` version from `main`
-- [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io. See example script below. NOTE: on `jaricheta`. You need to change this to your OWN docker.io username otherwise this will fail
+- [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io. See script below. NOTE: sign in to docker.io with team email: `2208team6@gmail.com` - password is in slack.
 
 ```bash
 #!/bin/bash
@@ -15,12 +15,12 @@ docker rm $(docker ps -a -q)
 
 # build respective docker images
 ## build load generator image
-docker build -t jaricheta/constellation-load-generator:latest ./constellation-load-generator
-docker push jaricheta/constellation-load-generator:latest
+docker build -t constellationlt/load-generator:latest ./constellation-load-generator
+docker push constellationlt/load-generator:latest
 
 ## build aggregator image
-docker build -t jaricheta/constellation-data-aggregator:latest ./constellation-data-aggregator
-docker push jaricheta/constellation-data-aggregator:latest
+docker build -t constellationlt/data-aggregator:latest ./constellation-data-aggregator
+docker push constellationlt/data-aggregator:latest
 ```
 
 Within Constellation-Local
