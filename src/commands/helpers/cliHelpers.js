@@ -95,14 +95,15 @@ const intervalledMsgManipulation = ({
     return Math.floor(Math.random() * (max - min + 1) + min);
   })(minMS, maxMS);
 
-  // if / 10 - increments by 10%, if / 20 - increments by 5%
   const increments = 5;
   const intervalDurationInMS = randDurationInMS / (100 / increments);
 
   let counter = 0;
   const intervalId = setInterval(() => {
+    // randomize +1 or -1
+    const rand = Math.random() < 0.5 ? -1 : 1;
     // increment counter
-    counter += increments;
+    counter += increments + rand;
     // dont allow counter to exceed 100 - increments
     if (counter > 100 - increments) {
       counter = 100 - increments;

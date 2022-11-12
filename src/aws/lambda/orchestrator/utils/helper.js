@@ -28,7 +28,15 @@ const readItem = async (id) => {
     */
     return Item.data.S;
   } catch (e) {
-    console.log(e);
+    // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html#Programming.Errors.ProvisionedThroughputExceededException
+    // for handling throttling error: ProvisionedThroughputExceededException, wait for 250ms and retry
+    if (e.name === "ProvisionedThroughputExceededException") {
+      console.log("throttling error encountered, retrying putItem");
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      return await readItem(id);
+    } else {
+      console.log(e);
+    }
   }
 };
 
@@ -53,7 +61,15 @@ const putItem = async (id, data) => {
     const command = new PutItemCommand(params);
     await client.send(command);
   } catch (e) {
-    console.log(e);
+    // https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html#Programming.Errors.ProvisionedThroughputExceededException
+    // for handling throttling error: ProvisionedThroughputExceededException, wait for 250ms and retry
+    if (e.name === "ProvisionedThroughputExceededException") {
+      console.log("throttling error encountered, retrying putItem");
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      return await putItem(id, data);
+    } else {
+      console.log(e);
+    }
   }
 };
 

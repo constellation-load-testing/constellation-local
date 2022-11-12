@@ -67,7 +67,7 @@ export class ConstellationRemoteStack extends Stack {
       cpu: 4096,
       desiredCount: 1,
       taskImageOptions: {
-        image: ecs.ContainerImage.fromRegistry("athresher/data-aggregator"),
+        image: ecs.ContainerImage.fromRegistry("constellationlt/data-aggregator"),
         containerPort: 3003,
         containerName: 'aggregator-container',
         taskRole: aggRemoteRole,
@@ -94,7 +94,7 @@ export class ConstellationRemoteStack extends Stack {
     const { VU, desiredCount } = getVUAndDesiredCountByRegion(this.region as keyof typeof config.REMOTE_REGIONS)
 
     testerTaskDef.addContainer('constellation-tester-container', {
-      image: ecs.ContainerImage.fromRegistry("athresher/load-generator"),
+      image: ecs.ContainerImage.fromRegistry("constellationlt/load-generator"),
       memoryLimitMiB: 1024,
       containerName: 'constellation-tester-container',
       essential: true, // default for single container taskdefs

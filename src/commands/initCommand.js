@@ -66,8 +66,8 @@ const init = async (options) => {
     oraInstance: header,
     initialMessage: `Home Region Infrastructure (${HOME_REGION}) -🟠 Deploying`,
     keyword: HOME_REGION,
-    minMS: 50 * 1000,
-    maxMS: 70 * 1000,
+    minMS: 60 * 1000,
+    maxMS: 100 * 1000,
   });
 
   await sh(`(cd ${awsPath} && cdk deploy \"*Home*\")`, isRaw);
