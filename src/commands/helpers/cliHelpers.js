@@ -100,8 +100,8 @@ const intervalledMsgManipulation = ({
 
   let counter = 0;
   const intervalId = setInterval(() => {
-    // randomize +1 or -1
-    const rand = Math.random() < 0.5 ? -1 : 1;
+    // randomize -2, 1, 0, 1, 2
+    const rand = Math.floor(Math.random() * 5) - 2;
     // increment counter
     counter += increments + rand;
     // dont allow counter to exceed 100 - increments

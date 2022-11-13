@@ -55,7 +55,7 @@ const runTest = async (options) => {
   header.text = appendMsg("Deploying remote regions -🟠 Deploying");
   const shellPromises = REMOTE_REGIONS.map((region) => {
     const whiteSpaceCount = 15 - region.length;
-    const message = "> " + region + " ".repeat(whiteSpaceCount) + "-";
+    const message = ":: " + region + " ".repeat(whiteSpaceCount) + "-";
     const intervalId = intervalledMsgManipulation({
       appendMsg,
       replaceMsg,
@@ -71,7 +71,7 @@ const runTest = async (options) => {
       .then(() => {
         devLog(`Deployed ${region} infrastructure`);
         clearInterval(intervalId);
-        header.text = replaceMsg(`${message} (100%)`, region);
+        header.text = replaceMsg(`${message} (100%) 🛠️`, region);
       })
       .catch((err) => {
         devLog(`Error deploying ${region} infrastructure`, err);
