@@ -35,15 +35,18 @@ const teardownRemote = async (options) => {
   const awsPath = path.resolve(__dirname, "..", "aws");
   devLog("AWS Path: ", awsPath);
 
+  header.text = appendMsg("Deprovisioning remote regions -🟠 Deprovisioning");
   const shellPromises = REMOTE_REGIONS.map((region) => {
+    const whiteSpaceCount = 15 - region.length;
+    const message = ":: " + region + " ".repeat(whiteSpaceCount) + "-";
     const intervalId = intervalledMsgManipulation({
       appendMsg,
       replaceMsg,
       oraInstance: header,
-      initialMessage: `Remote Region Infrastructure (${region}) -🟠 Deprovisioning`,
+      initialMessage: message,
       keyword: region,
-      minMS: 420 * 1000,
-      maxMS: 540 * 1000, // conservative range is 7-9 mins for each region
+      minMS: 300 * 1000,
+      maxMS: 540 * 1000, // conservative range is 5-9 mins for each region
     });
 
     const command = `(cd ${awsPath} && cdk destroy -f \"*${region}*\")`;
@@ -51,16 +54,13 @@ const teardownRemote = async (options) => {
       .then(() => {
         devLog(`Destroyed ${region} infrastructure`);
         clearInterval(intervalId);
-        header.text = replaceMsg(
-          `Remote Region Infrastructure (${region}) -🟢 Deprovisioned (100%)`,
-          region
-        );
+        header.text = replaceMsg(`${message} (100%) 🛠️`, region);
       })
       .catch((err) => {
         devLog(`Error destroying ${region} infrastructure`, err);
         clearInterval(intervalId);
         header.text = replaceMsg(
-          `Remote Region Infrastructure (${region}) -🔴 Failed! - Please wait for all deployment to finish and run teardown-all command or visit the CloudFormation AWS console and manually delete the stacks`,
+          `${message} 🔴 Failed! - Please wait for all deployment to finish and run teardown-all command or visit the CloudFormation AWS and manually delete the stacks`,
           region
         );
       });
@@ -68,6 +68,10 @@ const teardownRemote = async (options) => {
 
   await Promise.allSettled(shellPromises);
   devLog("Destroyed remote regions");
+  header.text = replaceMsg(
+    "Deprovisioning remote regions -🟢 Deprovisioned",
+    "Deprovisioning"
+  );
 
   header.text = appendMsg("Completed all remote region teardowns... 🛠️");
   header.stopAndPersist({
