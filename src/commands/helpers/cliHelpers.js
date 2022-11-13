@@ -70,7 +70,7 @@ const initMsgManipulation = (chalkFn, oraInstance) => {
 };
 
 /**
- * intervaled message manipulation, mutates the header text!
+ * intervaled message manipulation, mutates the header text! No need to provide (0%)
  * @param {appendMsg} function that appends a message to the header
  * @param {replaceMsg} function that replaces a message in the header
  * @param {import("ora").Ora} oraInstance needs to be a started ora instance

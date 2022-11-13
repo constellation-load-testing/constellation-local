@@ -52,12 +52,15 @@ const runTest = async (options) => {
   const awsPath = path.resolve(__dirname, "..", "aws");
   devLog("AWS Path: ", awsPath);
 
+  header.text = appendMsg("Deploying remote regions -🟠 Deploying");
   const shellPromises = REMOTE_REGIONS.map((region) => {
+    const whiteSpaceCount = 15 - region.length;
+    const message = "> " + region + " ".repeat(whiteSpaceCount) + "-";
     const intervalId = intervalledMsgManipulation({
       appendMsg,
       replaceMsg,
       oraInstance: header,
-      initialMessage: `Remote Region Infrastructure (${region}) -🟠 Deploying`,
+      initialMessage: message,
       keyword: region,
       minMS: 300 * 1000,
       maxMS: 400 * 1000, // conservative range is 300 to 400s for each region
@@ -68,16 +71,13 @@ const runTest = async (options) => {
       .then(() => {
         devLog(`Deployed ${region} infrastructure`);
         clearInterval(intervalId);
-        header.text = replaceMsg(
-          `Remote Region Infrastructure (${region}) -🟢 Deployed (100%)`,
-          region
-        );
+        header.text = replaceMsg(`${message} (100%)`, region);
       })
       .catch((err) => {
         devLog(`Error deploying ${region} infrastructure`, err);
         clearInterval(intervalId);
         header.text = replaceMsg(
-          `Remote Region Infrastructure (${region}) -🔴 Failed! - Please wait for all deployment to finish and run teardown-all command or visit the CloudFormation AWS and manually delete the stacks`,
+          `${message} 🔴 Failed! - Please wait for all deployment to finish and run teardown-all command or visit the CloudFormation AWS and manually delete the stacks`,
           region
         );
       });
@@ -85,6 +85,11 @@ const runTest = async (options) => {
 
   await Promise.allSettled(shellPromises);
   devLog("Deployed remote regions");
+  // looks for last line with "Deploying" and replaces it
+  header.text = replaceMsg(
+    "Deploying remote regions -🟢 Deployed",
+    "Deploying"
+  );
 
   header.text = appendMsg(
     "Contellation now running test, ready for visualization... 🕵️"
