@@ -52,7 +52,8 @@ app.get('/data', async (req, res) => {
   const regions = createRegions(regionsRaw);
   const regionObject = await writeData(regions, aggTime);
 
-  regions.push('all');
+  regions.push("All Regions");
+  regions.push("Consolidated");
   regionObject["regions"] = regions;
   res.send(regionObject);
 })
