@@ -10,8 +10,9 @@ const {
 
 const runVisualizer = async () => {
   const { ora, chalk } = await require("./helpers/esmodules.js")();
+  const serverPath = path.resolve(__dirname, "..", "..", "backend/server.js");
 
-  const command = "node ./backend/server.js";
+  const command = `node ${serverPath}`;
   return sh(command)
     .then(() => {
       devLog(`Deployed ${region} infrastructure`);
