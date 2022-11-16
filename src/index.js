@@ -6,6 +6,7 @@ const runTest = require("./commands/runTestCommand.js");
 const teardownHome = require("./commands/teardownHomeCommand.js");
 const teardownRemote = require("./commands/teardownRemoteCommand.js");
 const teardownAll = require("./commands/teardownAllCommand");
+const runVisualizer = require("./commands/runVisualizerCommand.js");
 
 cli.description("Constellation API Load Testing CLI");
 cli.name("constellation");
@@ -48,5 +49,10 @@ cli
   .option("--log", "Optional, logging of output, disables cli spinner")
   .description("Destroys all infrastructure")
   .action(teardownAll);
+
+cli
+  .command("run-visualizer")
+  .description("Runs the visualizer")
+  .action(runVisualizer);
 
 cli.parse(process.argv);

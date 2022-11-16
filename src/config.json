@@ -2,11 +2,9 @@
   "DURATION": 20000,
   "HOME_REGION": "us-east-1",
   "REMOTE_REGIONS": {
-    "ap-northeast-1": 1001,
-    "us-east-2": 2001,
-    "us-west-1": 3001,
-    "ap-south-1": 1000,
-    "sa-east-1": 100,
-    "ap-northeast-2": 3000
+    "us-east-1": 1,
+    "us-west-1": 1,
+    "us-west-2": 1,
+    "eu-west-1": 1
   }
 }
