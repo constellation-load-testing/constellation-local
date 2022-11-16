@@ -52,6 +52,7 @@ app.get('/data', async (req, res) => {
   const regions = createRegions(regionsRaw);
   const regionObject = await writeData(regions, aggTime);
 
+  regions.push('all');
   regionObject["regions"] = regions;
   res.send(regionObject);
 })
