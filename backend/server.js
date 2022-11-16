@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const port = 3002;
 const cors = require('cors');
-const HOME_REGION = require('../../src/config.json').HOME_REGION;
+const HOME_REGION = require('../src/config.json').HOME_REGION;
 app.use(cors());
 app.use(express.static(__dirname.concat('/build')));
 
