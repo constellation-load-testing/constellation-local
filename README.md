@@ -85,7 +85,7 @@ Within Constellation-Local
 - [ ] `constellation run-test --script <path>`
 
   - `<path>` is the relative path to the test script file in question
-  - Whats does this do?
+  - What does this do?
     - Writes the script file as `script.js` to the correct location (in /src)
     - Create s3 bucket (if needed) and uploads script.js to s3
     - Deploy remote regions (in parallel)
@@ -103,6 +103,11 @@ Within Constellation-Local
 
 - [ ] `constellation <other-commands>`
   - To be discussed
+
+### visualize
+- [ ] `constellation run-visualizer`
+  - What does this do?
+    - Runs visualizer app on http://localhost:3002/ 
 
 ### Teardown
 
