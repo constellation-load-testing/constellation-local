@@ -41,8 +41,8 @@ const runTest = async (options) => {
   header.text = replaceMsg("Script js file -🟢 Validated");
 
   header.text = appendMsg("Uploading script to cloud -🟠 Uploading");
-  const createS3AndUploadScript = require("../scripts/createS3AndUploadScript.js");
-  await createS3AndUploadScript();
+  const createScriptBucketAndUpload = require("../scripts/createScriptBucketAndUpload.js");
+  await createScriptBucketAndUpload();
   devLog("Uploaded script to S3");
   header.text = replaceMsg("Uploading script to cloud -🟢 Uploaded");
 

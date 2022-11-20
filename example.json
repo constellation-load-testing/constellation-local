@@ -1,12 +1,13 @@
 {
-  "DURATION": 20000,
+  "DURATION": 600000,
   "HOME_REGION": "us-east-1",
   "REMOTE_REGIONS": {
-    "ap-northeast-1": 1001,
-    "us-east-2": 2001,
-    "us-west-1": 3001,
-    "ap-south-1": 1000,
-    "sa-east-1": 100,
-    "ap-northeast-2": 3000
+    "us-east-1": 200,
+    "us-west-1": 100,
+    "ap-east-1": 100,
+    "ca-central-1": 100,
+    "eu-central-1": 50,
+    "me-south-1": 50,
+    "sa-east-1": 50
   }
 }
