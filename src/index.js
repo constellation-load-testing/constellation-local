@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const cli = require("commander");
+const check = require("./commands/checkCommand.js");
 const init = require("./commands/initCommand.js");
 const runTest = require("./commands/runTestCommand.js");
 const teardownHome = require("./commands/teardownHomeCommand.js");
@@ -17,6 +18,13 @@ cli
   .action((options) => {
     console.log(options, typeof options.log);
   });
+
+cli
+  .command("check")
+  .requiredOption("--config <path>", "Relative path to the config.json file")
+  .option("--log", "Optional, logging of output, disables cli spinner")
+  .description("To check if deployment to selected regions have issues")
+  .action(check);
 
 cli
   .command("init")

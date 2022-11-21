@@ -48,12 +48,6 @@ const init = async (options) => {
   devLog(`Bootstrap complete`);
   header.text = replaceMsg("AWS CDK Bootstrap -🟢 Completed");
 
-  header.text = appendMsg("AWS CDK Bootstrap Manual Checks -🟠 Processing");
-  const s3StagingBucketCheck = require("../scripts/S3StagingBucketCheck.js");
-  await s3StagingBucketCheck();
-  devLog("Staging Bucket Check Complete");
-  header.text = replaceMsg("AWS CDK Bootstrap Manual Checks -🟢 Completed");
-
   header.text = appendMsg("Home Stack Assets -🟠 Installing");
   await sh(`(cd ${awsPath}/lambda/orchestrator && npm install)`, isRaw);
   devLog("Installed orchestrator node_modules");
