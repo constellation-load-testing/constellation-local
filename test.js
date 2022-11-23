@@ -11,12 +11,8 @@ export const script = async (axiosInstance) => {
   //   timeStamp: Date.now(),
   // });
   // await sleep(500);
-  await axiosInstance.get("https://dog.ceo/api/breeds/image/random");
-  await sleep(500);
-  await axiosInstance.get("https://dog.ceo/api/breeds/image/random");
-  await sleep(500);
-  await axiosInstance.get("https://dog.ceo/api/breeds/image/random");
-  await sleep(500);
-  await axiosInstance.get("https://dog.ceo/api/breeds/image/random");
-  await sleep(500);
+  await axiosInstance.get("https://api.publicapis.org/health");
+  await sleep(2000);
+  await axiosInstance.get("https://api.publicapis.org/health");
+  await sleep(2000);
 };

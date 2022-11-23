@@ -1,4 +1,5 @@
 const gradient = require("gradient-string");
+const validateConfigFile = require("../scripts/validateConfigFile");
 const getAWSAccountNumber = require("../scripts/getAWSAccountNumber");
 const readWriteConfigFile = require("../scripts/readWriteConfigFile");
 const getRegionsWithoutCDKBucket = require("../scripts/getRegionsWithoutCDKBucket");
@@ -52,20 +53,38 @@ const check = async (options) => {
   );
 
   // MESSAGES & PROCESSES
-  // Task 1: - read & write config file to correct location
+  // Task 1: - read & write config file to correct location then validate it
   header.text = appendMsg("Config json file -🟠 Validating");
   const configPath = options.config;
   await readWriteConfigFile(configPath);
   devLog("config file fetched");
 
-  // Task 1.1: - extract regions from said config file, ensures unique (if a home region is coincidentally a remote region as well)
   const config = require("../config.json");
+  devLog("config read");
+  // Task 1.1 - validate entries of the config file
+  const { isValid: isConfigValid, message: configMsg } =
+    validateConfigFile(config);
+
+  if (!isConfigValid) {
+    header.text = replaceMsg("Config json file -🔴 Invalid");
+    header.text = appendMsg(`Message: ${configMsg}`);
+    header.stopAndPersist({
+      symbol: "❌ ",
+    });
+    // premature return @ config file validation fail
+    devLog(`Config file failed validation, see message: ${configMsg}`);
+    return;
+  }
+  devLog("config file validated, passed checks");
+
+  // Task 1.2: - extract regions from said config file, ensures unique (if a home region is coincidentally a remote region as well)
   const ALL_REGIONS = Array.from(
     new Set(Object.keys(config.REMOTE_REGIONS).concat(config.HOME_REGION))
   );
-  devLog("config file read and all regions extracted");
-  header.text = replaceMsg("Config json file -🟢 Validated");
 
+  devLog("config file all regions extracted");
+
+  header.text = replaceMsg("Config json file -🟢 Validated");
   // Task 2: get default account number which CDK is being used
   const accountNumber = await getAWSAccountNumber();
   devLog("Default AWS account number fetched:", accountNumber);
@@ -157,6 +176,9 @@ const check = async (options) => {
       symbol: "❌ ",
     });
   }
+
+  // function end
+  return;
 };
 
 module.exports = check;
