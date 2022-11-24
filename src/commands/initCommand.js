@@ -13,9 +13,7 @@ const {
 const init = async (options) => {
   const { ora, chalk } = await require("./helpers/esmodules.js")();
 
-  // isDev, if truthy, will show the raw logs, hidden from user
   devLog(options);
-  // options.log is either true or false
   if (options.log) {
     process.env.LOG_LEVEL = "raw";
   }
@@ -33,6 +31,7 @@ const init = async (options) => {
   );
 
   // MESSAGES & PROCESSES
+  // Installing lambda assets
   header.text = appendMsg("Home Stack Assets -🟠 Installing");
   const awsPath = path.resolve(__dirname, "..", "aws");
   await sh(`(cd ${awsPath}/lambda/orchestrator && npm install)`, isRaw);
@@ -50,6 +49,7 @@ const init = async (options) => {
     maxMS: 100 * 1000,
   });
 
+  // deploying home infrastructure
   await sh(`(cd ${awsPath} && cdk deploy \"*Home*\")`, isRaw);
   devLog("Deployed home infrastructure");
   clearInterval(intervalId);
@@ -57,6 +57,7 @@ const init = async (options) => {
     `Home Region Infrastructure (${HOME_REGION}) -🟢 Deployed (100%)`
   );
 
+  // initializing proper state on home components
   header.text = appendMsg(
     `Initializing Home Region Components (${HOME_REGION}) -🟠 Initializing`
   );

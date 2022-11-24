@@ -10,24 +10,26 @@ const {
 
 const runVisualizer = async () => {
   const { ora, chalk } = await require("./helpers/esmodules.js")();
+  const header = createOraInstance(ora, {
+    text: chalk.hex("#f7a11b").bold("Visualizing Data..."),
+    spinner: "earth",
+  }).start();
+
+  const { appendMsg, replaceMsg } = initMsgManipulation(
+    chalk.hex("#fddb45"),
+    header
+  );
+
   const serverPath = path.resolve(__dirname, "..", "..", "backend/server.js");
 
   const command = `node ${serverPath}`;
-  return sh(command)
-    .then(() => {
-      devLog(`Deployed ${region} infrastructure`);
-      clearInterval(intervalId);
-      header.text = replaceMsg(`${message} (100%) 🛠️`, region);
-    })
-    .catch((err) => {
-      devLog('Error initializing visualizer', err);
-      clearInterval(intervalId);
-      header.text = replaceMsg(
-        `${message} 🔴 Failed! - Please wait for all deployment to finish and run teardown-all command or visit the CloudFormation AWS and manually delete the stacks`,
-        region
-      );
+  return sh(command).catch((err) => {
+    devLog("Error initializing visualizer", err);
+    header.text = replaceMsg("Visualizing Data - failed to run server 🚨");
+    header.stopAndPersist({
+      symbol: "❌ ",
     });
+  });
 };
-
 
 module.exports = runVisualizer;

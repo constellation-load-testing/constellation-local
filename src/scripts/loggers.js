@@ -5,8 +5,6 @@ const devLog = (...message) => {
   console.log("🔍", ...message);
 };
 
-// guaranteed user-level logs are not used here
-
 module.exports = {
   devLog,
 };

@@ -14,13 +14,6 @@ cli.description("Constellation API Load Testing CLI");
 cli.name("constellation");
 
 cli
-  .command("tmp")
-  .option("--log", "test")
-  .action((options) => {
-    console.log(options, typeof options.log);
-  });
-
-cli
   .command("check")
   .requiredOption("--config <path>", "Relative path to the config.json file")
   .option("--log", "Optional, logging of output, disables cli spinner")
