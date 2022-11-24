@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-
 const cli = require("commander");
+const gradient = require("gradient-string");
+const { logo } = require("./constants/logo.js");
 const check = require("./commands/checkCommand.js");
 const init = require("./commands/initCommand.js");
 const runTest = require("./commands/runTestCommand.js");
@@ -23,7 +24,9 @@ cli
   .command("check")
   .requiredOption("--config <path>", "Relative path to the config.json file")
   .option("--log", "Optional, logging of output, disables cli spinner")
-  .description("To check if deployment to selected regions have issues")
+  .description(
+    "Runs checks on config file and AWS default CLI account for desired environments"
+  )
   .action(check);
 
 cli
@@ -31,7 +34,11 @@ cli
   .requiredOption("--config <path>", "Relative path to the config.json file")
   .option("--log", "Optional, logging of output, disables cli spinner")
   .description("Initialize the Constellation API Load Testing CLI")
-  .action(init);
+  .action(async (options) => {
+    console.log(gradient.summer(logo));
+    const isCheckSuccessful = await check(options);
+    if (isCheckSuccessful) await init(options);
+  });
 
 cli
   .command("run-test")

@@ -37,8 +37,6 @@ const check = async (options) => {
   }
   const isRaw = process.env.LOG_LEVEL === "raw" ? true : false;
 
-  console.log(gradient.summer(logo));
-
   // ORA;
   const header = createOraInstance(ora, {
     text: chalk
@@ -109,7 +107,8 @@ const check = async (options) => {
       .catch(() => {
         devLog("region:", region, "failed in bootstrapping phase!");
         header.text = replaceMsg(
-          message + " 🔴 Failed!, Please wait till all processes are completed",
+          message +
+            " 🔴 Failed!, Please wait until all processes are completed",
           region
         );
         // push to failed regions collection
@@ -127,12 +126,9 @@ const check = async (options) => {
     devLog("No regions failed bootstrapping 👍");
   } else {
     devLog("Regions which failed bootstrapping", failedRegions);
-    const regions = failedRegions.reduce(
-      (acm, region) => acm + " " + region,
-      ""
-    );
+    const regions = failedRegions.join(", ");
     header.text = appendMsg(
-      `Ended Prematurely, some regions failed bootstrapping... 😔, ${regions}. To amend this, complete the following steps: \n✨    1. Delete the S3 staging bucket\n✨    2. Delete the CDKToolkit stack from the AWS CloudFormation console\n✨    3. Re-run the \`constellation check\` command to confirm`
+      `Ended Prematurely, some regions failed bootstrapping. To amend this, complete the following steps (for ${regions}): \n✨    1. Delete the S3 staging bucket from the AWS console\n✨    2. Delete the CDKToolkit stack from the AWS CloudFormation console\n✨    3. Re-run the \`constellation check\` command to confirm`
     );
     header.stopAndPersist({
       symbol: "❌ ",
@@ -165,12 +161,9 @@ const check = async (options) => {
       "Checking for Staging Buckets -🔴 Failed",
       "Checking"
     );
-    const regions = failedS3Regions.reduce(
-      (acm, region) => acm + " " + region,
-      ""
-    );
+    const regions = failedS3Regions.join(", ");
     header.text = appendMsg(
-      `The following regions have missing staging buckets... ☕: ${regions}. To amend this, complete the following steps: \n✨    1. Delete the S3 staging bucket\n✨    2. Delete the CDKToolkit stack from the AWS CloudFormation console\n✨    3. Re-run the \`constellation check\` command to confirm`
+      `Ended Prematurely, some regions have missing staging buckets. To amend this, complete the following steps (for ${regions}): \n✨    1. Delete the S3 staging bucket from the AWS console\n✨    2. Delete the CDKToolkit stack from the AWS CloudFormation console\n✨    3. Re-run the \`constellation check\` command to confirm`
     );
     header.stopAndPersist({
       symbol: "❌ ",
@@ -178,7 +171,7 @@ const check = async (options) => {
   }
 
   // function end
-  return;
+  return true;
 };
 
 module.exports = check;

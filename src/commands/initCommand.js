@@ -21,8 +21,6 @@ const init = async (options) => {
   }
   const isRaw = process.env.LOG_LEVEL === "raw" ? true : false;
 
-  console.log(gradient.summer(logo));
-
   // ORA
   const header = createOraInstance(ora, {
     text: chalk.hex("#f7a11b").bold("Initializing Constellation..."),
@@ -35,20 +33,8 @@ const init = async (options) => {
   );
 
   // MESSAGES & PROCESSES
-  header.text = appendMsg("Config json file -🟠 Validating");
-  const configPath = options.config;
-  await readWriteConfigFile(configPath);
-  header.text = replaceMsg("Config json file -🟢 Validated");
-
-  const awsPath = path.resolve(__dirname, "..", "aws");
-  devLog(`Changing directory to AWS: ${awsPath}`);
-
-  header.text = appendMsg("AWS CDK Bootstrap -🟠 Processing");
-  await sh(`(cd ${awsPath} && cdk bootstrap)`, isRaw);
-  devLog(`Bootstrap complete`);
-  header.text = replaceMsg("AWS CDK Bootstrap -🟢 Completed");
-
   header.text = appendMsg("Home Stack Assets -🟠 Installing");
+  const awsPath = path.resolve(__dirname, "..", "aws");
   await sh(`(cd ${awsPath}/lambda/orchestrator && npm install)`, isRaw);
   devLog("Installed orchestrator node_modules");
   header.text = replaceMsg("Home Stack Assets -🟢 Installed");
