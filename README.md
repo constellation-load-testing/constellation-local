@@ -1,57 +1,43 @@
-# Development Notes
+![dark background](https://user-images.githubusercontent.com/80292641/204396033-16f9d275-2957-43d2-bf6f-a279b3b258c9.png)
 
-## CLI-Setup
+Constellation is an open-source, serverless, end-to-end framework that aims to simplify the challenges of geographically distributed API load testing.
 
-- [ ] Pull the latest `-local` version from `main`
-- [ ] Pull the latest `-src` version from `main` and build their container images and push to docker.io. See script below. NOTE: sign in to docker.io with team email: `2208team6@gmail.com` - password is in slack.
+## Constellation requires:
 
-```bash
-#!/bin/bash
+- an [AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html?nc2=h_ct&src=default)
+- `npm` [installed](https://www.npmjs.com/get-npm)
+- AWS CLI [installed](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) and configured
+- [AWS named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
+- AWS CDK command-line tool [installed](https://docs.aws.amazon.com/cdk/latest/guide/cli.html)
 
-# this stops all docker containers
-docker kill $(docker ps -q)
-# this removes all docker containers
-docker rm $(docker ps -a -q)
+## Installation
 
-# build respective docker images
-## build load generator image
-docker build -t constellationlt/load-generator:latest ./constellation-load-generator
-docker push constellationlt/load-generator:latest
+- run `npm install -g constellation-load-testing`
+- run `constellation help` to see a list of available commands
 
-## build aggregator image
-docker build -t constellationlt/data-aggregator:latest ./constellation-data-aggregator
-docker push constellationlt/data-aggregator:latest
-```
+## Usage
 
-Within Constellation-Local
+> For all commands add a `--log` flag if you want to see the raw AWS logs
 
-- [ ] After the images have been built, modify the asset names in the remote stack within `-local` to match the link given in docker.io. Note: this is done in two lines in the remote stack `.ts` file.
-  - Go to `/constellation-local/src/aws/lib/constellation-remote-stack.ts` and search two places for `image: ecs.ContainerImage.fromRegistry("<YOUR-IMAGE>")`
-- [ ] Attend to - with the CLI implementation, this does not need to be located at `/src` anymore.
-  - [ ] `config.json` to ensure that you have the correct configurations for the test. IE: Home region, remote region, Duration, VUs per region
-  - [ ] `script.js` to ensure that you are running the correct test script.
+### Quick Start
 
-## CLI
-
-> Developer Notes: As this is not YET an npm package, replace `constellation` with `node ./src/index.js` 🙏🙏
-> For all commands add a `--log` flag if you want to see the raw logs
-
-### For the lazy
-
-- End to end: Create config.json & script.js anywhere (doesn't matter)
-  - `init --config <path>` -> `run-test --script <path>` -> `teardown-all`
+- Full Test Deployment: Create a configuration JSON file and a script JavaScript file
+  - `constellation init --config <path>` -> `constellation run-test --script <path>` -> `constellation teardown-all`
   - OR
-  - `init --config <path>` -> `run-test --script <path>` -> `teardown-home` -> `teardown-remote`
-- Only Home: Create config.json anywhere (doesn't matter)
-  - `init --config <path>` -> `teardown-home`
+  - `constellation init --config <path>` -> `constellation run-test --script <path>` -> `constellation teardown-remote` -> `constellation teardown-home`
+- Home Only Deployment: Create a configuration JSON file
+  - `constellation init --config <path>` -> `constellation teardown-home`
 
-### Requirements
+### Test Setup
 
-- [ ] Tell user that for whichever regions they want to test from, ensure that their AWS account with allowed to run in that region for smooth deployment. See - [Managing AWS Regions](https://docs.aws.amazon.com/general/latest/gr/rande-manage.html)
-- [ ] Tell user to create a json file to be used as configuration for our deployment. README of source code will tell user how to format this json file. See example format below ~
-- [ ] Double check that the home region is a region that has available timestream database AWS service. This includes:
+- [ ] Ensure that the AWS account is allowed to run in the desired regions for smooth deployment. 
+  - See - [Managing AWS Regions](https://docs.aws.amazon.com/general/latest/gr/rande-manage.html)
+- [ ] Create a JSON file to be used as configuration for the deployment. 
+  - The JSON file requires three properties, `DURATION` (in milliseconds), `HOME_REGION`, and `REMOTE_REGIONS`
+  - The `Home_REGION` must be a region that has the Timestream database AWS service available. This includes:
   - `us-east-1`, `us-east-2`, `us-west-2`, `ap-southeast-3`, `ap-southeast-2`, `ap-northeast-1`, `eu-central-1`, `eu-west-1`
-
+  - The `REMOTE_REGIONS` value is an object with region names as properties and the number of desired Virtual Users for that region as values
+  - See example format below:
 ```json
 {
   "DURATION": 20000,
@@ -65,20 +51,39 @@ Within Constellation-Local
   }
 }
 ```
+- [ ] Create a JavaScript file to be used as the script for the Virtual Users
+  - The script file is a fully functional JavaScript file with a single function export
+  - Within the `script` function HTTP calls are made using an Axios instance, refer to the [Axios](https://axios-http.com/docs/intro) documentation
+  - Additional functionality can be implemented for use by the `script` function
+    - As an example the `sleep` function is used to pause between commands in the script
+    - While calls can be made using a newly imported instance of Axios or the built in Node.js `http` module they will not be recorded to the database
+  - See example format below:
+```javascript
+const sleep = async (ms) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+export const script = async (axiosInstance) => {
+  await axiosInstance.get('https://google.com');
+  await sleep(1000);
+};
+```
 
 ### Initialization
 
 - [ ] `constellation init --config <path>`
   - `<path>` is the relative path to the json file in question
-  - Background prcesses What does this do?
-    - Writes the config file as `config.json` to the correct location (in /src) for our code to read from
-    - Bootstraps the required regions
-    - Runs the staging bucket check (to hopefully mend bootstrapping errors)
+  - What does this do?
+    - Writes the config file as `config.json` to the correct location within the Constellation installation
+    - AWS bootstraps the required regions
+    - Runs the staging bucket check (to mend any bootstrapping errors)
     - Deploys home infrastructure
-    - Runs home initialization (without script.js s3 upload)
+    - Runs home initialization
   - Message to user:
     - Any appropriate status messages to the user upon deployment (can take 50-60s)
-    - Now ready to run test via `run-test` command. And refer to documentation (README) on how to create the `.js` file
+    - Now ready to run test via `run-test` command
 
 ### Running the Test
 
@@ -86,41 +91,33 @@ Within Constellation-Local
 
   - `<path>` is the relative path to the test script file in question
   - What does this do?
-    - Writes the script file as `script.js` to the correct location (in /src)
-    - Create s3 bucket (if needed) and uploads script.js to s3
-    - Deploy remote regions (in parallel)
+    - Writes the script file as `script.js` to the correct location within the Constellation installation
+    - Create an S3 bucket and uploads script.js to it
+    - Deploys remote regions (in parallel)
   - Message to user:
     - Any appropriate messages to the user while this is running (can take 200-300s)
-    - Notify the user that the test is now running. And that can be visualized accordingly. Use `constellation visualize`.
+    - Notify the user that the test is now running and that can be visualized accordingly using `constellation run-visualizer`.
     - Notify that the user is free to teardown the infrastructure at anytime with:
       - `constellation teardown-all`
       - `constellation teardown-home`
       - `constellation teardown-remote`
 
-- [ ] `constellation visualize`
+### Visualize Results
 
-  - @jake to be completed
-
-- [ ] `constellation <other-commands>`
-  - To be discussed
-
-### visualize
 - [ ] `constellation run-visualizer`
   - What does this do?
-    - Runs visualizer app on http://localhost:3002/ 
+    - Runs the visualizer app on http://localhost:3002/ 
 
 ### Teardown
 
 - [ ] `constellation teardown-home`
-
   - Whats does this do?
     - Run home cleanup scripts (clears s3 and timestream)
     - Destroys home region
-    - Note: this also teardown timestream database - therefore, data disappears
+    - Note: this includes removal of the Timestream database
   - Notify the user that this will also delete the timestream database data
 
 - [ ] `constellation teardown-remote`
-
   - Whats does this do?
     - Parallel destruction of remote region(s)
 
@@ -131,6 +128,10 @@ Within Constellation-Local
     - Destroys home region
     - Done.
   - Notify the user that this will also delete the timestream database data
+
+### Other Commands
+- [ ] `constellation <other-commands>`
+  - @jason to be completed
 
 # Orchestrator Workflow
 
