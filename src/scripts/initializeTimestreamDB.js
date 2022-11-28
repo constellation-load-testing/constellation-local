@@ -40,7 +40,7 @@ const createTimestreamDB = async () => {
         TableName: `${region}-tests`,
         RetentionProperties: {
           MemoryStoreRetentionPeriodInHours: 24,
-          MagneticStoreRetentionPeriodInDays: 7,
+          MagneticStoreRetentionPeriodInDays: 365,
         },
       };
       const createCalls = {
@@ -48,7 +48,7 @@ const createTimestreamDB = async () => {
         TableName: `${region}-calls`,
         RetentionProperties: {
           MemoryStoreRetentionPeriodInHours: 24,
-          MagneticStoreRetentionPeriodInDays: 7,
+          MagneticStoreRetentionPeriodInDays: 365,
         },
       };
       const createTestsResponse = await tryTableCreation(createTests);
