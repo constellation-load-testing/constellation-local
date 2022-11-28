@@ -1,4 +1,5 @@
 const gradient = require("gradient-string");
+const validateConfigFile = require("../scripts/validateConfigFile");
 const getAWSAccountNumber = require("../scripts/getAWSAccountNumber");
 const readWriteConfigFile = require("../scripts/readWriteConfigFile");
 const getRegionsWithoutCDKBucket = require("../scripts/getRegionsWithoutCDKBucket");
@@ -10,22 +11,6 @@ const {
   initMsgManipulation,
 } = require("./helpers/cliHelpers.js");
 
-/**
- * The purpose of this command is to conduct preliminary checks on
- * ... the user made config file. Thus the task of this command needs to be:
- *   1. Fetch and write the config file to the correct location
- *     - this will be done again in the init-test command
- *   1.1. Get the regions out of the config file
- *   2. Fetch the default account number which is being used
- *     - (ref. S3StagingBucketCheck)
- *   3. Perform manual cdk commands - at isolated processes:
- *     - see: https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html#:~:text=Bootstrapping%20with%20the%20AWS%20CDK%20Toolkit
- *     - see: via `cdk bootstrap ${accountNumber}/${region}`
- *   3.1. If any regions fail, show message
- *   4. Perform cdk bucket existence check
- *   4.1 Do NOT create bucket for user but only inform that this will be an issue
- *   5. Pass on message to user about next steps and run check again
- */
 const check = async (options) => {
   const { ora, chalk } = await require("./helpers/esmodules.js")();
 
@@ -35,8 +20,6 @@ const check = async (options) => {
     process.env.LOG_LEVEL = "raw";
   }
   const isRaw = process.env.LOG_LEVEL === "raw" ? true : false;
-
-  console.log(gradient.summer(logo));
 
   // ORA;
   const header = createOraInstance(ora, {
@@ -52,26 +35,43 @@ const check = async (options) => {
   );
 
   // MESSAGES & PROCESSES
-  // Task 1: - read & write config file to correct location
+  // Read & Write config file
   header.text = appendMsg("Config json file -🟠 Validating");
   const configPath = options.config;
   await readWriteConfigFile(configPath);
   devLog("config file fetched");
 
-  // Task 1.1: - extract regions from said config file, ensures unique (if a home region is coincidentally a remote region as well)
   const config = require("../config.json");
+  devLog("config read");
+  // Validate config file contents
+  const { isValid: isConfigValid, message: configMsg } =
+    validateConfigFile(config);
+
+  if (!isConfigValid) {
+    header.text = replaceMsg("Config json file -🔴 Invalid");
+    header.text = appendMsg(`Message: ${configMsg}`);
+    header.stopAndPersist({
+      symbol: "❌ ",
+    });
+    // premature return @ config file validation fail - with msg
+    devLog(`Config file failed validation, see message: ${configMsg}`);
+    return;
+  }
+  devLog("config file validated, passed checks");
+
+  // Extract regions from config file (unique)
   const ALL_REGIONS = Array.from(
     new Set(Object.keys(config.REMOTE_REGIONS).concat(config.HOME_REGION))
   );
-  devLog("config file read and all regions extracted");
-  header.text = replaceMsg("Config json file -🟢 Validated");
 
-  // Task 2: get default account number which CDK is being used
+  devLog("config file all regions extracted");
+
+  header.text = replaceMsg("Config json file -🟢 Validated");
+  // Fetch caller AWS account number
   const accountNumber = await getAWSAccountNumber();
   devLog("Default AWS account number fetched:", accountNumber);
 
-  // Task 3: Create commands for bootstrapping and isolate to child processes
-  //         + store failed regions
+  // Parallelize bootstrapping and isolate any failed regions
   header.text = appendMsg("Bootstrapping All regions -🟠 Boostrapping");
   devLog("Bootstrapping regions according to:", ALL_REGIONS);
   const failedRegions = [];
@@ -90,7 +90,8 @@ const check = async (options) => {
       .catch(() => {
         devLog("region:", region, "failed in bootstrapping phase!");
         header.text = replaceMsg(
-          message + " 🔴 Failed!, Please wait till all processes are completed",
+          message +
+            " 🔴 Failed!, Please wait until all processes are completed",
           region
         );
         // push to failed regions collection
@@ -98,7 +99,7 @@ const check = async (options) => {
       });
   });
 
-  // see if parallelized promises break bootstrapping
+  // parallelized bootstrapping appears to work fine
   await Promise.allSettled(shellPromises);
   if (failedRegions.length === 0) {
     header.text = replaceMsg(
@@ -108,12 +109,9 @@ const check = async (options) => {
     devLog("No regions failed bootstrapping 👍");
   } else {
     devLog("Regions which failed bootstrapping", failedRegions);
-    const regions = failedRegions.reduce(
-      (acm, region) => acm + " " + region,
-      ""
-    );
+    const regions = failedRegions.join(", ");
     header.text = appendMsg(
-      `Ended Prematurely, some regions failed bootstrapping... 😔, ${regions}. To amend this, complete the following steps: \n✨    1. Delete the S3 staging bucket\n✨    2. Delete the CDKToolkit stack from the AWS CloudFormation console\n✨    3. Re-run the \`constellation check\` command to confirm`
+      `Ended Prematurely, some regions failed bootstrapping. To amend this, complete the following steps (for ${regions}): \n✨    1. Delete the S3 staging bucket from the AWS console\n✨    2. Delete the CDKToolkit stack from the AWS CloudFormation console\n✨    3. Re-run the \`constellation check\` command to confirm`
     );
     header.stopAndPersist({
       symbol: "❌ ",
@@ -122,7 +120,7 @@ const check = async (options) => {
     return;
   }
 
-  // 4. Perform cdk bucket check by region (regions are automatically discerned)
+  // Perform cdk bucket check by region (regions are automatically discerned)
   header.text = appendMsg("Checking for Staging Buckets -🟠 Checking");
   const failedS3Regions = await getRegionsWithoutCDKBucket(ALL_REGIONS);
 
@@ -146,17 +144,17 @@ const check = async (options) => {
       "Checking for Staging Buckets -🔴 Failed",
       "Checking"
     );
-    const regions = failedS3Regions.reduce(
-      (acm, region) => acm + " " + region,
-      ""
-    );
+    const regions = failedS3Regions.join(", ");
     header.text = appendMsg(
-      `The following regions have missing staging buckets... ☕: ${regions}. To amend this, complete the following steps: \n✨    1. Delete the S3 staging bucket\n✨    2. Delete the CDKToolkit stack from the AWS CloudFormation console\n✨    3. Re-run the \`constellation check\` command to confirm`
+      `Ended Prematurely, some regions have missing staging buckets. To amend this, complete the following steps (for ${regions}): \n✨    1. Delete the S3 staging bucket from the AWS console\n✨    2. Delete the CDKToolkit stack from the AWS CloudFormation console\n✨    3. Re-run the \`constellation check\` command to confirm`
     );
     header.stopAndPersist({
       symbol: "❌ ",
     });
   }
+
+  // function end, returns true due to chained `init` command
+  return true;
 };
 
 module.exports = check;

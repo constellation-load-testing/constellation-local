@@ -31,8 +31,8 @@ const teardownHome = async (options) => {
     header
   );
 
-  header.text = appendMsg("Clearing Home Components -🟠 Clearing");
   // clean up home components before destroying
+  header.text = appendMsg("Clearing Home Components -🟠 Clearing");
   const clearAndDeleteS3 = require("../scripts/clearAndDeleteS3.js");
   const clearTimestream = require("../scripts/clearTimestream.js");
   await clearAndDeleteS3();
@@ -49,6 +49,7 @@ const teardownHome = async (options) => {
     minMS: 50 * 1000,
     maxMS: 70 * 1000,
   });
+
   // destroy home infrastructure
   const awsPath = path.resolve(__dirname, "..", "aws");
   devLog("AWS Path: ", awsPath);

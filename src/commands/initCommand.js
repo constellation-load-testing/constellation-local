@@ -13,15 +13,11 @@ const {
 const init = async (options) => {
   const { ora, chalk } = await require("./helpers/esmodules.js")();
 
-  // isDev, if truthy, will show the raw logs, hidden from user
   devLog(options);
-  // options.log is either true or false
   if (options.log) {
     process.env.LOG_LEVEL = "raw";
   }
   const isRaw = process.env.LOG_LEVEL === "raw" ? true : false;
-
-  console.log(gradient.summer(logo));
 
   // ORA
   const header = createOraInstance(ora, {
@@ -35,20 +31,9 @@ const init = async (options) => {
   );
 
   // MESSAGES & PROCESSES
-  header.text = appendMsg("Config json file -🟠 Validating");
-  const configPath = options.config;
-  await readWriteConfigFile(configPath);
-  header.text = replaceMsg("Config json file -🟢 Validated");
-
-  const awsPath = path.resolve(__dirname, "..", "aws");
-  devLog(`Changing directory to AWS: ${awsPath}`);
-
-  header.text = appendMsg("AWS CDK Bootstrap -🟠 Processing");
-  await sh(`(cd ${awsPath} && cdk bootstrap)`, isRaw);
-  devLog(`Bootstrap complete`);
-  header.text = replaceMsg("AWS CDK Bootstrap -🟢 Completed");
-
+  // Installing lambda assets
   header.text = appendMsg("Home Stack Assets -🟠 Installing");
+  const awsPath = path.resolve(__dirname, "..", "aws");
   await sh(`(cd ${awsPath}/lambda/orchestrator && npm install)`, isRaw);
   devLog("Installed orchestrator node_modules");
   header.text = replaceMsg("Home Stack Assets -🟢 Installed");
@@ -64,6 +49,7 @@ const init = async (options) => {
     maxMS: 100 * 1000,
   });
 
+  // deploying home infrastructure
   await sh(`(cd ${awsPath} && cdk deploy \"*Home*\")`, isRaw);
   devLog("Deployed home infrastructure");
   clearInterval(intervalId);
@@ -71,6 +57,7 @@ const init = async (options) => {
     `Home Region Infrastructure (${HOME_REGION}) -🟢 Deployed (100%)`
   );
 
+  // initializing proper state on home components
   header.text = appendMsg(
     `Initializing Home Region Components (${HOME_REGION}) -🟠 Initializing`
   );

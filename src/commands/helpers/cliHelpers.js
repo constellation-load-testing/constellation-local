@@ -8,6 +8,8 @@ const createOraInstance = (ora, { text, spinner }) => {
         console.log("ora disabled");
         return {
           stopAndPersist: () => {},
+          stop: () => {},
+          succeed: () => {},
           text: text,
         };
       },

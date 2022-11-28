@@ -30,6 +30,7 @@ const runTest = async (options) => {
   );
 
   // MESSAGES & PROCESSES
+  // fetches script file
   header.text = appendMsg("Script js file -🟠 Validating");
   const testPath = options.script;
   const testFile = await fs.readFile(testPath, "utf8");
@@ -40,6 +41,7 @@ const runTest = async (options) => {
   devLog("Config file written to: ", path.join(__dirname, "../script.js"));
   header.text = replaceMsg("Script js file -🟢 Validated");
 
+  // uploading to s3
   header.text = appendMsg("Uploading script to cloud -🟠 Uploading");
   const createScriptBucketAndUpload = require("../scripts/createScriptBucketAndUpload.js");
   await createScriptBucketAndUpload();
@@ -77,7 +79,7 @@ const runTest = async (options) => {
         devLog(`Error deploying ${region} infrastructure`, err);
         clearInterval(intervalId);
         header.text = replaceMsg(
-          `${message} 🔴 Failed! - Please wait for all deployment to finish and run teardown-all command or visit the CloudFormation AWS and manually delete the stacks`,
+          `${message} 🔴 Failed! - Run \`constellation teardown-all\` command and run \`constellation check\` on existing config file`,
           region
         );
       });
@@ -85,7 +87,7 @@ const runTest = async (options) => {
 
   await Promise.allSettled(shellPromises);
   devLog("Deployed remote regions");
-  // looks for last line with "Deploying" and replaces it
+
   header.text = replaceMsg(
     "Deploying remote regions -🟢 Deployed",
     "Deploying"
