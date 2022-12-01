@@ -83,7 +83,8 @@ export const script = async (axiosInstance) => {
     - Runs home initialization
   - Message to user:
     - Any appropriate status messages to the user upon deployment (can take 50-60s)
-    - Now ready to run test via `run-test` command
+    - Now ready to run test via `run-test` command. And refer to documentation (README) on how to create the `.js` file
+![Initialize gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/init_constellation.gif)
 
 ### Running the Test
 
@@ -102,11 +103,13 @@ export const script = async (axiosInstance) => {
       - `constellation teardown-home`
       - `constellation teardown-remote`
 
+![run_test gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/run_test_constellation.gif)
 ### Visualize Results
 
 - [ ] `constellation run-visualizer`
   - What does this do?
-    - Runs the visualizer app on http://localhost:3002/ 
+    - Runs visualizer app on http://localhost:3002/ 
+![run_visualizer gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/run_visualizer.gif)
 
 ### Teardown
 
@@ -116,11 +119,11 @@ export const script = async (axiosInstance) => {
     - Destroys home region
     - Note: this includes removal of the Timestream database
   - Notify the user that this will also delete the timestream database data
-
+![teardown_home gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/home_teardown.gif)
 - [ ] `constellation teardown-remote`
   - Whats does this do?
     - Parallel destruction of remote region(s)
-
+![teardown_remote gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/remote_teardown.gif)
 - [ ] `constellation teardown-all`
   - What does this do?
     - Parallel destruction of remote region(s)
@@ -128,10 +131,7 @@ export const script = async (axiosInstance) => {
     - Destroys home region
     - Done.
   - Notify the user that this will also delete the timestream database data
-
-### Other Commands
-- [ ] `constellation <other-commands>`
-  - @jason to be completed
+![teardown_all gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/teardown_all.gif)
 
 # Orchestrator Workflow
 
