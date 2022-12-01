@@ -79,7 +79,7 @@ Within Constellation-Local
   - Message to user:
     - Any appropriate status messages to the user upon deployment (can take 50-60s)
     - Now ready to run test via `run-test` command. And refer to documentation (README) on how to create the `.js` file
-![Initialize gif]([https://drive.google.com/file/d/1uuI-uCnwNMk_tmWpphEA-YkcVyOjDjbW/view?usp=share_link](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/init_constellation.gif))
+![Initialize gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/init_constellation.gif)
 ### Running the Test
 
 - [ ] `constellation run-test --script <path>`
