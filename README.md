@@ -96,7 +96,7 @@ Within Constellation-Local
       - `constellation teardown-all`
       - `constellation teardown-home`
       - `constellation teardown-remote`
-
+![run_test gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/run_test_constellation.gif)
 - [ ] `constellation visualize`
 
   - @jake to be completed
@@ -108,7 +108,7 @@ Within Constellation-Local
 - [ ] `constellation run-visualizer`
   - What does this do?
     - Runs visualizer app on http://localhost:3002/ 
-
+![run_visualizer gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/run_visualizer.gif)
 ### Teardown
 
 - [ ] `constellation teardown-home`
@@ -118,12 +118,12 @@ Within Constellation-Local
     - Destroys home region
     - Note: this also teardown timestream database - therefore, data disappears
   - Notify the user that this will also delete the timestream database data
-
+![teardown_home gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/home_teardown.gif)
 - [ ] `constellation teardown-remote`
 
   - Whats does this do?
     - Parallel destruction of remote region(s)
-
+![teardown_remote gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/remote_teardown.gif)
 - [ ] `constellation teardown-all`
   - What does this do?
     - Parallel destruction of remote region(s)
@@ -131,7 +131,7 @@ Within Constellation-Local
     - Destroys home region
     - Done.
   - Notify the user that this will also delete the timestream database data
-
+![teardown_all gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/teardown_all.gif)
 # Orchestrator Workflow
 
 DynamoDB will have three items:
