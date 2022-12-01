@@ -84,7 +84,8 @@ export const script = async (axiosInstance) => {
   - Message to user:
     - Any appropriate status messages to the user upon deployment (can take 50-60s)
     - Now ready to run test via `run-test` command. And refer to documentation (README) on how to create the `.js` file
-![Initialize gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/init_constellation.gif)
+    
+![init_constellation_cropped](https://user-images.githubusercontent.com/80292641/205150068-16345c0d-91ec-4af3-8f01-7bdd4f958026.gif)
 
 ### Running the Test
 
@@ -103,7 +104,8 @@ export const script = async (axiosInstance) => {
       - `constellation teardown-home`
       - `constellation teardown-remote`
 
-![run_test gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/run_test_constellation.gif)
+![run_test_constellation_cropped](https://user-images.githubusercontent.com/80292641/205150151-7b2cbcb8-33ff-4193-8a26-8375e1b52b7d.gif)
+
 ### Visualize Results
 
 - [ ] `constellation run-visualizer`
@@ -113,17 +115,17 @@ export const script = async (axiosInstance) => {
 
 ### Teardown
 
+- [ ] `constellation teardown-remote`
+  - Whats does this do?
+    - Parallel destruction of remote region(s)
+![remote_teardown_cropped](https://user-images.githubusercontent.com/80292641/205150254-dd042e40-68ea-4a83-9670-ae1060b8ee9c.gif)
 - [ ] `constellation teardown-home`
   - Whats does this do?
     - Run home cleanup scripts (clears s3 and timestream)
     - Destroys home region
     - Note: this includes removal of the Timestream database
   - Notify the user that this will also delete the timestream database data
-![teardown_home gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/home_teardown.gif)
-- [ ] `constellation teardown-remote`
-  - Whats does this do?
-    - Parallel destruction of remote region(s)
-![teardown_remote gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/remote_teardown.gif)
+![home_teardown_cropped](https://user-images.githubusercontent.com/80292641/205150222-7f1ff801-f7d4-40cf-bc9d-5fb7b7bf2e30.gif)
 - [ ] `constellation teardown-all`
   - What does this do?
     - Parallel destruction of remote region(s)
@@ -131,7 +133,7 @@ export const script = async (axiosInstance) => {
     - Destroys home region
     - Done.
   - Notify the user that this will also delete the timestream database data
-![teardown_all gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/teardown_all.gif)
+![teardown_all_cropped](https://user-images.githubusercontent.com/80292641/205150283-a6868792-f647-45b9-be0d-386af78f34d8.gif)
 
 # Orchestrator Workflow
 
