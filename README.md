@@ -97,14 +97,8 @@ Within Constellation-Local
       - `constellation teardown-home`
       - `constellation teardown-remote`
 ![run_test gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/run_test_constellation.gif)
-- [ ] `constellation visualize`
-
-  - @jake to be completed
-
-- [ ] `constellation <other-commands>`
-  - To be discussed
-
 ### visualize
+
 - [ ] `constellation run-visualizer`
   - What does this do?
     - Runs visualizer app on http://localhost:3002/ 
