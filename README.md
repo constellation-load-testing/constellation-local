@@ -114,7 +114,7 @@ USAGE
   $ constellation run-visualizer
 ```
 
-![run_visualizer gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/run_visualizer.gif)
+![run_visualizer](https://user-images.githubusercontent.com/51255216/207951251-65531899-d89a-4ca7-aaa5-ca34ac22328a.gif)
 
 ## `constellation teardown-all`
 
