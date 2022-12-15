@@ -18,7 +18,7 @@ cli
   .requiredOption("--config <path>", "Relative path to the config.json file")
   .option("--log", "Optional, logging of output, disables cli spinner")
   .description(
-    "Runs checks on config file and AWS default CLI account for desired environments"
+    "Runs preliminary checks for regions detected in user config file against default AWS CLI account. Ideal for first time usage or new remote region deployment."
   )
   .action(check);
 
@@ -26,7 +26,9 @@ cli
   .command("init")
   .requiredOption("--config <path>", "Relative path to the config.json file")
   .option("--log", "Optional, logging of output, disables cli spinner")
-  .description("Initialize the Constellation API Load Testing CLI")
+  .description(
+    "Initialize the Constellation API Load Testing CLI according to user configuration"
+  )
   .action(async (options) => {
     console.log(gradient.summer(logo));
     const isCheckSuccessful = await check(options);
@@ -37,30 +39,32 @@ cli
   .command("run-test")
   .requiredOption("--script <path>", "Relative path to the script.js file")
   .option("--log", "Optional, logging of output, disables cli spinner")
-  .description("Running the test script")
+  .description(
+    "Deploys remote infrastructure and runs the test script in a geographically distributed manner"
+  )
   .action(runTest);
 
 cli
   .command("teardown-home")
   .option("--log", "Optional, logging of output, disables cli spinner")
-  .description("Command tears down the home infrastructure")
+  .description("Tears down the home infrastructure")
   .action(teardownHome);
 
 cli
   .command("teardown-remote")
   .option("--log", "Optional, logging of output, disables cli spinner, ")
-  .description("Destroys the remote region(s) infrastructure")
+  .description("Tears down the remote region(s) infrastructure")
   .action(teardownRemote);
 
 cli
   .command("teardown-all")
   .option("--log", "Optional, logging of output, disables cli spinner")
-  .description("Destroys all infrastructure")
+  .description("Tearsdown all infrastructure")
   .action(teardownAll);
 
 cli
   .command("run-visualizer")
-  .description("Runs the visualizer")
+  .description("Displays the Constellation visualizer at Port 3002")
   .action(runVisualizer);
 
 cli.parse(process.argv);
