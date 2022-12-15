@@ -1,4 +1,4 @@
-![dark background](https://user-images.githubusercontent.com/80292641/204396033-16f9d275-2957-43d2-bf6f-a279b3b258c9.png)
+![asset2copy-modified](https://user-images.githubusercontent.com/80292641/207950581-5621692f-e251-48ca-a8dd-ec7c539971f2.png)
 
 > Constellation is an open-source, serverless, end-to-end framework that aims to simplify the challenges of geographically distributed API load testing.
 
