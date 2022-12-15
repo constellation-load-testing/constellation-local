@@ -38,18 +38,6 @@ $ constellation teardown-all
 - For the config file contents, see the [config](#configuration-file) section.
 - For the script file contents, see the [scripting](#scripting) section.
 
-# First Time Usage Checklist
-
-When first using constellation, it is important to run the following:
-
-```bash
-$ constellation check --config <path>
-```
-
-This command checks the compatibility of the default AWS account to run against the desired regions detected in your config file. In the background, Constellation's automated deployment heavily relies on the AWS CDK. This can be a source of issue when an AWS account is choosing to deploy to regions that have not yet been [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) in the past.
-
-Prior to deploying to specific region(s), it is best to ensure that the AWS account has access to that specific region. See [Managing AWS Regions](https://docs.aws.amazon.com/general/latest/gr/rande-manage.html) for more details.
-
 # Commands
 
 <!-- commands -->
@@ -66,6 +54,10 @@ Prior to deploying to specific region(s), it is best to ensure that the AWS acco
 
 An optional command which validates your AWS account against the required environments the Constellation Infrastructure is to be deployed on.
 
+In the background, Constellation's automated deployment heavily relies on the AWS CDK. This can be a source of issues when an AWS account is choosing to deploy to regions that have not yet been [bootstrapped](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html) in the past.
+
+Prior to deploying to specific region(s), it is best to ensure that the AWS account has access to that specific region. See [Managing AWS Regions](https://docs.aws.amazon.com/general/latest/gr/rande-manage.html) for more details.
+
 ```
 USAGE
   $ constellation check --config <path>
@@ -81,7 +73,7 @@ See the [config](#configuration-file) section to see how the configuration file 
 
 ## `constellation init`
 
-Validates the user configuration file and deploys the home infrastructure in addition to initializing it with proper state.
+Validates the user configuration file and deploys the home infrastructure.
 
 ```
 USAGE
@@ -98,7 +90,7 @@ NOTE
 
 ## `constellation run-test`
 
-Deploys the remote infrastructure and runs conducts geo-distributed load testing with the targetted test-script
+Deploys the remote infrastructure and conducts geo-distributed load testing with the targeted test script
 
 ```
 USAGE
@@ -116,6 +108,12 @@ NOTE
 ## `constellation run-visualizer`
 
 Displays your test results in localhost:3002
+
+```
+USAGE
+  $ constellation run-visualizer
+```
+
 ![run_visualizer gif](https://github.com/constellation-load-testing/constellation-visualizer/blob/main/run_visualizer.gif)
 
 ## `constellation teardown-all`
@@ -127,7 +125,9 @@ USAGE
   $ constellation teardown-all
 
 NOTE
-  Can be run at anytime during the deployment stage. Note that this will remove the timestream database storing test-results (if any). Run `teardown-remote` to selectively remove remote infrastructure only.
+  Can be run at anytime during the deployment stage. 
+  This will remove the timestream database storing test-results (if any). 
+  Run `teardown-remote` to selectively remove remote infrastructure only.
 ```
 
 ![teardown_all_cropped](https://user-images.githubusercontent.com/80292641/205150283-a6868792-f647-45b9-be0d-386af78f34d8.gif)
@@ -141,14 +141,15 @@ USAGE
   $ constellation teardown-remote
 
 NOTE
-  Used to minimize deployed infrastructure after following a test while preserving test-results stored at the database.
+  Used to minimize deployed infrastructure following a test while preserving test-results stored at the database.
+  Remote containers are automatically stopped after testing, remote regions will not generate cost even if this command is not run.  
 ```
 
 ![remote_teardown_cropped](https://user-images.githubusercontent.com/80292641/205150254-dd042e40-68ea-4a83-9670-ae1060b8ee9c.gif)
 
 ## `constellation teardown-home`
 
-Specifically teardown home region infrastructure only. Useful command when only used the [constellation init](#constellation-init) command for testing deployment. Note that this will remove the timestream database storing test-results (if any).
+Specifically teardown home region infrastructure only. Useful when only the [constellation init](#constellation-init) command has been run. Note that this will remove the timestream database storing test results (if any).
 
 ```
 USAGE
@@ -162,7 +163,7 @@ NOTE
 
 # Configuration file
 
-## Quick Example
+## Example
 
 > Within a .json file
 
@@ -185,24 +186,26 @@ NOTE
 The configuration file is written in JSON format and consists of three section:
 
 - `"DURATION"` - duration of test (in ms)
-- `"HOME_REGION"` - location of home infrastructure.See [HOME_REGION](#home_region) section for valid entries.
-- `"REMOTE_REGIONS"` - remote regions involved in the test AND associated number of virtual users for each region. See [REMOTE_REGIONS](#remote_regions) section for valid entries.
+- `"HOME_REGION"` - location of home infrastructure. See [HOME_REGION](#home_region) section for valid entries.
+- `"REMOTE_REGIONS"` - remote regions involved in the test and the associated number of virtual users for each region. See [REMOTE_REGIONS](#remote_regions) section for valid entries.
 
-> Tip: Use the [`constellation check`](#constellation-check) to quickly check the validity of your configuration file.
+> Tip: Use the [`constellation check`](#constellation-check) command to quickly check the validity of your configuration file.
 
 ### HOME_REGION
 
 The `HOME_REGION` must be a region that has the Timestream database AWS service available.
 
-**This includes**:
+**As of Decemeber 2022 this includes**:
 |||||
 |--|--|--|--|
 |`us-east-1`|`us-east-2`|`us-west-2`|`ap-southeast-3`|
 |`ap-southeast-2`|`ap-northeast-1`|`eu-central-1`|`eu-west-1`|
 
+> See [Timestream Pricing](https://aws.amazon.com/timestream/pricing/) for a current list of available regions.
+
 ### REMOTE_REGIONS
 
-The `REMOTE_REGION` contains key-value pairs. With keys being valid AWS regions and values being the number of simuated virtual users one wishes to generate from each region.
+The `REMOTE_REGION` contains key-value pairs. Keys are valid AWS regions and values are the number of virtual users desired from each region.
 
 Example:
 
@@ -222,7 +225,7 @@ Example:
 
 # Scripting
 
-## Quick Example
+## Example
 
 ```js
 const sleep = async (ms) => {
@@ -243,11 +246,15 @@ export const script = async (axiosInstance) => {
 
 ## Details
 
-The script file is a fully functional JavaScript file with a single function export **named** `script`. This function requires a single parameter to be passed. To capture the results from the respective API calls made in the script, attach valid methods to it.
+The script file is a JavaScript file with a single function export **named** `script`. This function has a single argument which is an instance of Axios.
 
-Contellation load generation uses Axios to faciliate the HTTP API calls. As such, any axios methods can be used for reflecting user behavior in the test script (ie: `.get`, `.post`, `.put`, etc). See the [Axios documentation](https://axios-http.com/docs/intro) for more details.
+Contellation load generation uses Axios to faciliate the HTTP API calls. As such, any axios methods can be used to reflect user behavior in the test script (ie: `.get`, `.post`, `.put`, etc). See the [Axios documentation](https://axios-http.com/docs/intro) for more details.
 
-Furthermore, the test script is essentially just a nodejs script. As such, user-defined functions can be freely used in the test script to aid in translating user behavior to raw API calls.
+Furthermore, the test script is essentially just a nodejs script. As such, user-defined functions can be freely used in the test script to aid in translating user behavior to raw API calls. 
+
+> WARNING: Computation heavy functions should not be implemented here as they will block the load generators thread. Follow testing best practices of strictly defining actions. Take, for example, a test involving making a request, processing the response, then making another request based on the processed results. Do not perform the processing within the script, instead strictly define what the processed data should be and use that to make the second request.
+
+> Note: If any other fetching API is used apart from the parameter passed to the script (ie: `fetch`, or a new instance of `axios`), they will be executed but the responses will not be captured.
 
 ## Comprehensive Example:
 
@@ -280,4 +287,4 @@ export const script = async (axiosInstance) => {
 };
 ```
 
-Note: If any other fetching API is used apart from the parameter passed to the script (ie: `fetch`, or a new instance of `axios`), they will be executed but the responses will not be captured.
+
